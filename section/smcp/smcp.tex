@@ -7,12 +7,11 @@ Thomas, V.*, Piché, A.*, , Ibrahim, C., Bengio, Y. and Pal, C. ``Probabilistic 
 
 This work was done jointly with Alexandre Pich\'{e} during the summer 2018 at Mila and ElementAI and was presented at ICLR 2019. 
 \section*{Foreword}
-The original intuition was that it should be possible to have a tree search planning algorithm where interesting (\emph{i.e} might get high return) branches were reinforced and less interesting branches cut off. Using control as inference was a natural way to associate the return a branch might get to the probability it would have to be reinforced or cut.
+The original intuition for this work  was that it should be possible to have a tree search planning algorithm where interesting (\emph{i.e} might get high return) branches were reinforced and less interesting branches cut off. Using control as inference was a natural way to associate the return a branch might get to the probability it would have to be reinforced or cut.
 
 To the best of our knowledge, there is only one article that framed planning as an inference problem~\citep{attias2003planning} and it was in a very specific setting with strong assumptions.
 We realized that our idea was intimately linked with sequential Monte Carlo methods and that our algorithm could be framed as an instance of a particle filter.
 In control theory, there is a duality between estimating the current state and controlling the dynamics to the desired goal. While particle filters are typically used for estimation, here, within the context of control as inference, we are able to design a particle filter algorithm for control.
-
 
 
 \section*{Impact since publication}
@@ -28,16 +27,18 @@ ning in MPC and may be \textbf{one of the most promising directions}[to improve 
 
 \section*{Personal contribution}
 \begin{itemize}
-    \item Major contribution on the theoretical understanding of the method. Made the link with the two-filter formula~\citep{bresler1986two} and smoothing/forward-backward algorithms
-    \item Determined the expression for the update (maximum entropy advantage) and wrote the proofs in the appendix
-    \item Designed and performed the toy experiment~\Cref{fig:toy_sis} and \Cref{fig:toy_sir}
-    \item Made \Cref{fig:hmm}, \Cref{fig:tree} and \Cref{fig:alphabeta}
+    \item Major contribution on the theoretical understanding of the method.
+        Making the link with the two-filter formula~\citep{bresler1986two} and smoothing/forward-backward algorithms
+    \item Determining the expression for the update (maximum entropy advantage)
+        and writing the proofs in the appendix
+    \item Designing and performing the toy experiment~\Cref{fig:toy_sis} and \Cref{fig:toy_sir}
+    \item Creating \Cref{fig:hmm}, \Cref{fig:tree} and \Cref{fig:alphabeta}
     \item Writing of the paper alongside with Alexandre
 \end{itemize}
 
 \newpage
 \begin{abstract}
-In this work, we propose  a novel formulation of planning which views it as a probabilistic inference problem over future optimal trajectories. This enables us to use sampling methods, and thus, tackle planning in continuous %
+In this work, we propose a novel formulation of planning which views it as a probabilistic inference problem over future optimal trajectories. This enables us to use sampling methods, and thus, tackle planning in continuous %
 domains using a fixed computational budget.  We design a new algorithm, Sequential Monte Carlo Planning, by leveraging classical methods in Sequential Monte Carlo and Bayesian smoothing in the context of \textit{control as inference}.  %
 Furthermore, we show that Sequential Monte Carlo Planning can capture multimodal policies and can quickly learn continuous control tasks. %
 \end{abstract}
