@@ -1,0 +1,28 @@
+\chapter{Independently Controllable Factors}
+\label{chapter:icf}
+\section*{Article details}
+Thomas V*, Bengio E*, Fedus W*, Pondard J, Beaudoin P, Larochelle H, Pineau J, Precup D, Bengio Y. ``Disentangling the independently controllable factors of variation by interacting with the world''. Presented at the \emph{ NeurIPS 2017 workshop on Learning Disentangled Representations: from Perception to Control} as an oral talk. 
+
+Previous iterations of this paper have been presented at \emph{Reinforcement Learning and Decision Making (RLDM) 2017} and at the \emph{Montreal AI Symposium}.
+
+\section*{Foreword}
+This project began at first in January 2017 and led to several short papers and involved many authors from different institutions. The first one, ~\citet{bengio2017independently} was published at RLDM 2017, a subsequent and longer paper,~\citet{thomas2017independently} was presented at the Montreal AI Symposium 2017, and finally, a latter and more theoretically sound version, \citet{thomas2018disentangling} was presented as a spotlight paper in the NeurIPS 2017 workshop on Learning Disentangled Features: from Perception to Control.
+
+The original motivation for this project is the way young children spontaneously learn to discover what they can do, how they can affect the world and the surrounding objects in a totally unsupervised manner~\citep{berlyne1966curiosity, gopnik1999scientist}. To do so, they associate aspects of the world they can control to a representation of such aspect -or object- in their brain. In this line of work, we looked at, in particular, aspects of the world that can be modified and represented indepedently from each other: we call them \textbf{independently controllable factors of variations}. This combines two objectives into one: (1) the agent has to discover without supervision a diverse set of policies it can execute, and (2) each policy must be mapped to a representation in the latent space.
+
+The first point has been the focus of several works where, as in our work, the objective is similar to a mutual information criterion between the observed states and the label of the policy (or option/skill/context used)~\citep{still2012information, mohamed2015variational, gregor2016variational, florensa2017stochastic, eysenbach2018diversity, achiam2018variational}.
+
+The second point, learning disentangled representation for reinforcement learning has been investigated by~\citet{anand2019unsupervised} where they annotate by hand \emph{attributes} of the world and learn a representation that shares a high mutual information with those attributes. In a more complex 3D world. \citet{eslami2018neural} learn a representation of a scene by encoding the information about different viewpoints at once. Works combining both the idea of exploring and learning a good representation of the world are more rare. We can cite \citet{kim2019emi}, where they use a mutual information objective to help exploration and learning of representation (this is however not unsupervised) and ~\citet{li2018disentangled} a follow-up work on the contribution presented here where they propose a simple mechanism to discover factors that cannot be controlled by the agent.
+
+A very challenging aspect of this work was to be able to learn a diversity of meaningful factors. In the end, we always observed what we called a \emph{factor collapse} where a few interesting factors would be learned but many would remain undiscovered no matter the amount of training. While we were able to characterize and understand this problem very well, we did not manage at the time to solve it. Recently~\citet{strouse2021learning} proposed a solution to this issue by discriminating between \emph{aleatoric} and \emph{epistemic} uncertainties using an ensemble of neural networks, thus encouraging the system to be more curious about learning new factors rather than exploiting the ones already discovered.
+
+\section*{Personal contribution}
+\begin{itemize}
+    \item Theoretical understanding of what objective ICF is optimizing. Making the link with (causal) mutual information
+    \item Understanding and showcasing how our structured representation can be used for planning and inference
+    \item Empirical validation (code + visualization) for most experiments presented in this paper.
+\end{itemize}
+
+\newpage
+
+\input{articles/icf/icf.tex}

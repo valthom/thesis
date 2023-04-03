@@ -1,0 +1,289 @@
+
+\documentclass[12pt,twoside,phd]{dms}
+
+\usepackage[utf8]{inputenc} %
+\usepackage[T1]{fontenc}    %
+\usepackage{textcomp}
+
+\usepackage{lmodern}
+
+\francais %
+
+
+\def\sloppy{%
+  \tolerance 500%
+  \emergencystretch 3em%
+  \hfuzz .5pt
+  \vfuzz\hfuzz}
+\sloppy   %
+
+\usepackage{graphicx,amssymb,icomma}
+
+
+\usepackage[labelfont=bf, width=\linewidth]{caption}
+
+\usepackage{hyperref}  %
+\hypersetup{colorlinks=true,allcolors=black}
+\usepackage{hypcap}   %
+\usepackage{bookmark} %
+
+
+\newtheorem{cor}{\corollaryname}[section]
+\newtheorem{deff}[cor]{\definitionname}
+\newtheorem{ex}[cor]{\examplename}
+\newtheorem{lem}[cor]{\lemmaname}
+\newtheorem{proposition}[cor]{Proposition}
+\newtheorem{prop}[cor]{Proposition}
+\newtheorem{rem}[cor]{\remarkname}
+\newtheorem{theo}[cor]{\theoremname}
+\theoremstyle{definition}
+\newtheorem{algo}[cor]{\algoname}
+
+
+
+\numberwithin{equation}{section}
+\numberwithin{table}{chapter}
+\numberwithin{figure}{chapter}
+
+\usepackage{float}
+
+
+
+\usepackage[onehalfspacing]{setspace}
+
+\usepackage{natbib}
+
+\usepackage{mathptmx}
+\usepackage{nicefrac}
+\usepackage{thmtools, thm-restate}
+
+\usepackage{xspace}
+
+\usepackage{lscape}  %
+
+\usepackage{threeparttable} %
+
+\usepackage{dcolumn,amsmath}
+
+\usepackage{amsfonts}
+\usepackage{amsthm}
+
+\usepackage{epsfig}
+
+
+
+\input{math_commands.tex}
+
+\usepackage{xspace}
+\usepackage{lscape}  %
+
+\usepackage{cleveref}
+\usepackage{threeparttable} %
+\usepackage{wrapfig}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{bbm}
+\usepackage[x11names,table]{xcolor}
+\usepackage{soul}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{heuristica}
+\usepackage{dcolumn}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{booktabs} %
+\usepackage{amsmath}
+\usepackage{amssymb, bbm}
+\usepackage{tikz}
+\usepackage{tkz-euclide}
+\usetikzlibrary{fit, positioning, arrows, automata, decorations.pathmorphing}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{mathtools}
+\usepackage{epsfig}
+\usepackage{adjustbox}
+\newcommand{\kl}[2]{\gD_{\textsc{KL}}\big(#1||#2\big)}
+
+\usepackage{enumitem}
+
+\setlist[itemize]{label=\textbullet}
+
+\definecolor{right}{HTML}{697c2a}
+\definecolor{down}{HTML}{000000}
+
+
+
+\definecolor{alpha}{RGB}{234, 186, 120}
+\definecolor{beta}{RGB}{46, 156, 210}
+\def\mathunderline#1#2{\color{#1}\underline{{\color{black}#2}}\color{black}}
+\DeclareSymbolFontAlphabet{\mathbb}{AMSb}
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+\newcommand{\rmodel}{r_{\text{model}}} %
+\newcommand{\remove}[1]{}
+\newcommand{\penv}{p_{\text{env}}} %
+\newcommand{\traj}{\tau} %
+\newcommand{\return}{\gR}
+\newcommand{\reward}{r}
+\newcommand{\Expect}{\mathop{\mathbb{E}}}
+\newcommand{\parampol}{\theta} %
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+\newcommand{\val}[1]{\textcolor{red}{#1}}
+\newcommand{\qpol}{q_\theta} 
+
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+\definecolor{amaranth}{rgb}{0.9, 0.17, 0.31}
+\definecolor{cerulean}{rgb}{0.0, 0.48, 0.65}
+\definecolor{burntorange}{rgb}{0.8, 0.33, 0.0}
+\definecolor{darkorchid}{rgb}{0.6, 0.2, 0.8}
+\definecolor{darkterracotta}{rgb}{0.8, 0.31, 0.36}
+\definecolor{dartmouthgreen}{rgb}{0.05, 0.5, 0.06}
+\definecolor{darkpastelred}{rgb}{0.76, 0.23, 0.13}
+\definecolor{myred}{rgb}{0.81, 0.06, 0.13}
+\definecolor{myblue}{rgb}{0.15, 0.23, 0.89}
+\usepackage{multirow}
+\newcommand{\appropto}{\mathrel{\vcenter{
+  \offinterlineskip\halign{\hfil$##$\cr
+    \propto\cr\noalign{\kern2pt}\sim\cr\noalign{\kern-2pt}}}}}
+
+\newcommand{\q}{q_\theta}
+\newcommand{\logit}{\varphi_\theta}
+\newcommand{\logitx}{\varphi(x ;\theta)}
+\newcommand{\thetamle}{\theta^{\text{MLE}}}
+\newcommand{\trhic}{\Tr{(\rmH^{-1} \rmC})}
+\newcommand{\Cc}{\tilde{\rmSS}} %
+\newcommand{\F}{\rmF}
+\newcommand{\G}{\rmG} %
+
+\usepackage{flafter}
+\newtheorem{theorem}{Theorem}
+\newtheorem{example}{Example}
+\newtheorem{assumption}{Assumption}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
+\usepackage{textcomp}
+
+
+\usepackage{url}
+
+
+\makeatletter
+\renewenvironment{abstract}{%
+  \if@twocolumn
+    \section*{\abstractname}%
+  \else
+    \vspace{2em}
+    \begin{center}%
+      {\bfseries \abstractname\vspace{1em}\vspace{\z@}}%
+    \end{center}%
+    \quotation
+  \fi}
+{\if@twocolumn\else\endquotation\fi}
+\makeatother
+
+
+
+
+\begin{document}
+
+\version{1}
+
+
+
+\title{Learning and Planning with Noise in Optimization and Reinforcement Learning}
+
+\author{Valentin Thomas}
+
+\copyrightyear{2023}
+
+\department{Département d'informatique et de recherche op\'{e}rationnelle}
+
+\date{\today} %
+
+\sujet{Informatique}
+
+\president{Nom du président du jury}
+
+\directeur{Yoshua Bengio}
+
+\codirecteur{Nicolas Le Roux}         %
+
+\membrejury{Pierre-Luc Bacon}
+
+\examinateur{Philip S. Thomas}   %
+
+
+
+\repdoyen{Nom du représentant du doyen} %
+
+
+\maketitle
+\maketitle
+
+
+\francais
+
+
+\include{section/intro/0_resume}
+
+
+\anglais
+\include{section/intro/0_abstract}
+
+\anglais
+\cleardoublepage
+\pdfbookmark[chapter]{\contentsname}{toc}  %
+\tableofcontents
+\phantomsection  %
+\listoftables
+\phantomsection
+\listoffigures
+
+\include{section/intro/0_notation}
+
+\include{section/0_thanks}
+
+\NoChapterPageNumber
+\cleardoublepage
+
+
+\include{section/intro/1_introduction.tex}
+
+\include{section/background}
+
+
+\include{section/icf/icf.tex}
+\include{section/smcp/smcp}
+\include{section/noise_curvature/hfc}
+\include{section/baselines_rl/baselines}
+\include{section/future}
+
+
+
+
+\bibliographystyle{icml2018}
+\def\bibname{R\'ef\'erences bibliographiques} %
+\bibliography{references}
+
+
+
+
+\appendix
+\chapter{Le titre}
+
+\section{Section un de l'Annexe A}
+
+...texte...
+
+\chapter{Les différentes parties et leur ordre d'apparition}
+
+J'ajoute ici les différentes parties d'un mémoire ou d'une thèse ainsi
+que leur ordre d'apparition tel que décrit dans le guide de
+présentation des mémoires et des thèses de la Faculté des études
+supérieures.  Pour plus d'information, consultez le guide sur le site
+web de la facutlé (www.fes.umontreal.ca).
+
+
+\end{document}

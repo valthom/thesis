@@ -1,0 +1,297 @@
+
+\section{Reinforcement Learning}
+\label{sec:RL}
+\val{
+\begin{itemize}
+    \item Add figure for RL interaction either here or in intro
+\end{itemize}
+}
+\subsection{General setting and Markov Decision Processes}
+
+Reinforcement learning (RL) is a sequential decision making problem where an agent can take \textit{decisions} or \textit{actions} in a world, called \textit{environment}, in order to maximize some signal called the \textit{reward}. This is formalized as a Markov Decision Process (MDP) as described in~\citet{bellman1954theory} and~\citet{puterman2014markov}. An MDP is a tuple $\langle \gS, \gA, \penv, r, \mu\rangle$ where $\gS$ is the set of states, $\gA$ is set of possible actions that the agent can take, $r: \gS \times \gA \mapsto \mathbb{R}$ is the reward function, a function that maps a state and action to a scalar and $\penv(s' | s, a), \quad s', s \in \gS \times \gS, a \in \gA$ is the transition function, a probability distribution over states given the current state and action. The assumption that the next state only depends only on the current state and the action taken by the agent, and not on previous states or actions is referred to as \emph{the Markov assumption}.
+
+The goal of the agent is to learn a probability distribution over actions called a policy $\pi(a_t|s_t)$ that maximizes the discounted sum of the reward
+$$\gJ(\pi) = \E_{a_t \sim \pi(\cdot|s_t), s_{t+1} \sim \penv(\cdot | s_t, a_t)}[\sum_t \gamma^t \reward(s_t, a_t)]$$
+where $\gamma \in [0, 1 [$, the \emph{discount factor} is here to ensure the objective remains bounded. Typically the policy $\pi$ is parametrized by a neural network with weights $\theta$, we will refer to this parametrized policy network as $\pi_\theta$ and the objective will be denoted either $\gJ(\pi_\theta)$ or $\gJ(\theta)$.
+
+In practice, the agent will interact with the environment in the following manner
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\begin{algorithm}[H]
+\caption{Sample a trajectory}
+\label{alg:sample_traj}
+\begin{algorithmic}[1]
+\STATE \textit{// Initialize starting state}
+\STATE $s_0 \sim \mu(\cdot)$
+\STATE $\tau_{0:0} = \{ \}$
+\FOR{$t$ in $\{0,\ldots, T\}$ }
+\STATE \textit{// Sample and execute action}
+\STATE $a_t \sim \pi(a_t|s_t)$
+\STATE $s_{t+1}, r_t \sim \penv(\cdot | s_t, a_t)$
+\STATE \textit{// Update trajectory and return}
+\STATE $\tau_{0:t} \leftarrow \tau_{0:t-1} \cup \{s_t, a_t\}$
+\STATE $R_t \leftarrow R_{t-1} + \gamma^t r_t$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\end{center}
+\vspace{1em}
+
+Where a trajectory $\tau_{0:T}$ is the sequence of state-action pairs $\traj_{0:T}=\{(s_0,a_0), \ldots,(s_T, a_T) \}$ encountered and $R_t$ is the empirical discounted return, i.e the sum of discounted rewards for this trajectory. It appears clearly that this process is highly stochastic as it requires sampling actions from our policy (which could have a high entropy) as well as sampling the next state and reward from the environment transition dynamics $\penv$, which is a priori unknown and could be highly unpredictable. Therefore, even for a given policy $\pi$, the trajectory sampled $\tau$ and its associated discounted return $R_t$ can be vastly different every time \Cref{alg:sample_traj} is run. This \emph{noise} arising from the interaction between the agent and the environment at the core of most contributions presented in this thesis.
+
+Furthermore, under some conditions\footnote{For a unique stationary distribution to exist, the MDP must be \emph{irreducible} and \emph{aperiodic}.} the MDP admits a unique \emph{stationary distribution} $d^\pi$. \Cref{alg:sample_traj}, if ran with $T\to\infty$, would eventually sample states and actions according to $d^\pi$. If we are interested in the discounted return, we can adapt \Cref{alg:sample_traj} by adding a probability $1-\gamma$ of restarting from the initial distribution $\mu$ at every step. The stationary distribution of this discounted MDP will be referred to as $d^\pi_\gamma$.
+
+While in traditional optimization we assume we can evaluate our objective function immediately, in reinforcement learning it needs to be evaluated though this noisy interactive process. Thus, it is not surprising that many of the algorithms used in reinforcement learning have the following structure
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\begin{algorithm}[H]
+\caption{Alternating policy evaluation and policy improvement}
+\label{alg:sample_traj}
+\begin{algorithmic}[1]
+\STATE Choose an initial policy $\pi_0$ 
+\FOR{$t$ in $\{0,\ldots, T\}$ }
+\STATE \textit{// Policy evaluation}
+\STATE Estimate $\gJ(\pi_t)$ though interaction (real or simulated)
+\STATE \textit{// Policy improvement}
+\STATE Improve $\pi_t$ to $\pi_{t+1}$ based on the evaluation of $\pi_t$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\end{center}
+\vspace{1em}
+
+The next two subsections will thus respectively be concerned with the \emph{policy evaluation} and \emph{policy improvement} problems.
+
+\subsection{Value functions in reinforcement learning}
+Alongside with the policy $\pi$, one of the most important concept in reinforcement learning is the notion of \emph{value function}.
+Intuitively, it is a measure of how ``good'' a current situation is for the agent, or more precisely ``how much discounted return'' we can expect to gather from a given situation.
+
+\subsubsection{Value and Q functions}
+We first define the value and Q functions. Both are expectations of the future discounted return, but while for the value it is conditional on a state $s$, for the Q function we condition on both a state and an action $s, a$.
+
+Thus, for the value function $V^\pi$
+\begin{equation}
+    V^\pi(s_t) = \E \big[ \sum_{t' \ge t} \gamma^{t'-t} r_{t'} | {a_t \sim \pi(\cdot|s_t), s_{t+1}, r_t \sim \penv(\cdot | s_t, a_t), \dots} \big] 
+\end{equation}
+
+The Q function is the expected discounted return under the current policy conditioned on the current state and action
+
+\begin{equation}
+    Q^\pi(s_t, a_t) = \E \big[ \sum_{t' \ge t} \gamma^{t'-t} r_{t'} | {s_{t+1}, r_t \sim \penv(\cdot | s_t, a_t), a_{t+1} \sim \pi(\cdot|s_{t+1}), \dots} \big] 
+\end{equation}
+
+These two functions can be easily related to our original objective
+$$\gJ(\pi) = \E_{s_0 \sim \mu} [ V^\pi(s_0)] = \E_{s_0 \sim \mu, a_0 \sim \pi(\cdot | s_0)} [ Q^\pi(s_0, a_0)]$$
+
+Thus the value function averaged over the initial state is the objective function we aimed at evaluating.
+
+
+
+\subsubsection{Bellman equations for $V^\pi$ and $Q^\pi$}
+\label{subsec:bellman_eq}
+Because of the Markov assumption implicitly, i.e that the distribution of $s_{t+1}$ and $r_t$ only depends on $s_t$ and $a_t$, the value of a state can be expressed in function of the value of its successor states. Indeed, the value and Q functions verify a recursion known as the Bellman equation
+
+\begin{eqnarray}
+    V^\pi(s_t) &=& \E_{a_t, s_{t+1} \dots} \big[ \sum_{t' \ge t} \gamma^{t'-t} r_{t'} | s_t \big] \nonumber\\
+    &=&  \E_{a_t, s_{t+1} \dots} \big[ r_t + \gamma \sum_{t' \ge t+1} \gamma^{t'-(t+1)} r_{t'} | s_t \big]\nonumber\\
+     &=&  \E_{a_t, s_{t+1}
+} \big[ r_t + \gamma \E_{a_{t+1}, s_{t+2} \dots} [\sum_{t' \ge t+1} \gamma^{t'-(t+1)} r_{t'} | s_t, a_t, s_{t+1} \big] \quad \text{(Law of Total Expectation)}\nonumber\\
+    &=&  \E_{a_t, s_{t+1}} \big[ r_t + \gamma \E_{a_{t+1}, s_{t+2} \dots} [\sum_{t' \ge t+1} \gamma^{t'-(t+1)} r_{t'} | s_{t+1} \big] \quad \text{(Markov property)}\nonumber\\
+    &=& \E [r_t + \gamma V^\pi(s_{t+1})]
+\end{eqnarray}
+
+
+In the same manner
+\begin{equation}
+\label{eq:expected_bellman}
+    Q^\pi(s_t, a_t) =  \E [r_t + \gamma Q^\pi(s_{t+1}, a_{t+1})]
+\end{equation}
+
+More generally, by unrolling the equation for $n$ steps instead of just one, we can get
+\begin{equation}
+      V^\pi(s)  = \E [\sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n V^\pi(s_{t+n})]
+\end{equation}
+And we will refer to $R^{n}_t \triangleq \sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n V^\pi(s_{t+n})$ as the \emph{$n$-step return}, which is a random variable conditioned on state $s_t$. The $0$-step return is simply the value function of $s_t$ while the $\infty$-step return (i.e where we unroll until the episode stops) is the empirical discounted return $R_t$. This circles back to the definition of $V^\pi(s_t)$ as being the expected empirical return from $s_t$. As all the $n$-step returns are unbiased estimates of the value function, it is also possible to mix them in order to obtain new estimators such as the $\lambda$-return which weights the $n$-step returns according to a geometric distribution of parameter $\lambda$
+
+\begin{equation}
+\label{eq:lambda_return}
+    R^\lambda_t \triangleq (1-\lambda) \sum_{n \ge 1} \lambda^{n-1} \sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n V^\pi(s_{t+n})
+\end{equation}
+
+For $\lambda=0$, we get back the $1$-step return $r_t + \gamma V^\pi(s_t)$ while for $\lambda \to 1$, $R^\lambda_t$ is the Monte Carlo return, i.e the empirical discounted return until the end of the episode.
+
+
+\subsubsection{Learning parametric value functions}
+\label{subsec:td}
+
+Now we will see how to use the properties of the true value function $V^\pi$ to build a parametric estimator of it. While there exit non-parametric methods, often referred to as \emph{memory-based} methods~\citep{atkeson1997locally}, nowadays in most settings the value function is parametrized via a neural network. Let us call $\phi$ the parameters of the value (respectively Q) function approximator $V_\phi$ (resp $Q_\phi$).
+
+As the value function satisfies the Bellman equation~\cref{eq:expected_bellman}, we can learn a function that satisfies the same equation
+
+\begin{equation}
+\label{eq:MSBE}
+    \min_\phi \tfrac{1}{2} \E_{s, a} \big[ \E_{s', r}[ \big( r(s,a) + \gamma V_\phi(s')] - V_\phi(s) \big)^2\big]
+\end{equation}
+where the expectations are taken over transitions $s', r, s, a$ encountered during a trajectory. This loss is referred to as the Mean Square Bellman Error (MSBE). %
+However, taking the gradient of this loss directly poses some practical challenges
+
+$$\nabla_\phi \text{MSBE}(\phi) = \E_{s, a} \big[ \E_{s', r}[ \big( r(s,a) + \gamma V_\phi(s')] - V_\phi(s) \big) \cdot \big(\E_{s', r}[ \gamma \nabla_\phi V_\phi(s')] - \nabla_\phi V_\phi(s) \big)\big]$$
+While we used the notation $s'$ in the two expectations $\E_{s', r}$ we need to have access to two independent samples of $s' \sim \penv(\cdot |s,a)$ for this gradient to be unbiased, and it is not something we can do easily without access to a simulator of the environment. This is known as the \emph{double sampling} problem~\citep{baird1995residual}. In order to circumvent this issue, we can ``fix'' the \emph{target} $r(s,a) + \gamma V_\phi(s')$ and not differentiate it.
+This lead to the \emph{pseudo-gradient}
+$$ - \E_{s, a, s', r} \big[\big( r(s,a) + \gamma V_\phi(s') - V_\phi(s) \big) \cdot \nabla_\phi V_\phi(s)\big]$$
+This update rule using this pseudo-gradient is known as the TD(0) algorithm, which stands for \textbf{Temporal Difference} learning~\citep{sutton1988learning} and it can be expressed as an expectation over a transition $(s, a, r, s')$
+ is suitable for use with stochastic gradient descent and deep neural networks. Therefore, it remains one of the most popular methods for learning value functions to this day.
+
+Furthermore we can extend TD(0) to TD($\lambda$) by using a $\lambda$-return for the target, i.e $R^\lambda_t$ instead of $r_t + \gamma V_\phi(s_t)$.
+
+\subsection{Policy optimization}
+
+Ultimately, as mentioned previously, our goal is to improve $\gJ$, given our current policy $\pi$ we aim at finding a new one $\pi'$ yielding a higher expected return, i.e $\gJ(\pi') \ge \gJ(\pi)$. In the next subsections, we will present \emph{Policy gradient} and \emph{policy greedification}, the two main families of policy improvement methods used in modern reinforcement learning.
+
+\subsubsection{Policy gradient and actor critic methods}
+To learn a new policy via gradient ascent, we need to differentiate through the objective $\gJ(\pi_\theta)$ with respect to the policy parameter $\theta$.
+We have~\citep{williams1992simple, sutton1999policy}
+\begin{equation}
+    \label{eq:policy_gradient}
+    \nabla_\theta \gJ(\theta) = \E_{s, a \sim d^\pi_\gamma(s,a)} [ Q^\pi(s,a) \nabla_\theta \log \pi_\theta(a|s)]
+\end{equation}
+Note that this requires knowledge of the true $Q$-function and an expectation over all states to be exact. In practice, we use an estimator for $Q^\pi(s,a)$ and perform a \emph{stochastic gradient} update by sampling $s,a \sim d^\pi$ by rolling out trajectories in the environment\footnote{Note here that sampling from $d^\pi$ instead of $d^\pi_\gamma$, while theoretically incorrect is widely used in practice. See~\citep{nota2019policy} for a more in-depth discussion.}.
+
+When we use the Monte Carlo estimate $R(s, a)$ instead of $Q^\pi(s,a)$, we usually refer to this method simply as ``vanilla policy gradient'' as we don't necessarily need to learn a parametric value function to improve our policy. 
+
+Alternatively we can use a bootstrapped estimator of the value function as presented in \Cref{subsec:bellman_eq} such as $r(s,a) + \gamma V_\phi(s')$ or a $\lambda$-return instead of $Q^\pi$. Furthermore, for reasons motivated by variance reduction, it is common to subtract the value function at the current state $V_\phi(s)$ from the $Q$-function estimator. This gives us a stochastic gradient estimate $A_{\phi}(s,a) \nabla_\theta \log \pi_\theta(a|s)$ where $A_\phi(s,a)$ is called the \emph{advantage function}. $A_\phi(s,a)$ is typically the difference between 1) a quantity whose expectation is the Q function and 2) the value function. The role of subtracting the value function in the advantage will be the subject of our contribution in~\Cref{chapter:baselines}. $A_\phi$ is also referred to as a \emph{critic} as it will be positive when choosing $a$ results in a higher value than the expectation of all actions according to the policy. On the other hand, the policy network $\pi_\theta$ chooses which action to perform and as such is called the \emph{actor}. Thus this class of algorithms where we learn on set of parameters $\theta$ to act and another set of parameters $\phi$ to judge the value of the action is called \textbf{actor-critic algorithms.} 
+
+For instance here is a simple actor-critic algorithm using a 1-step return advantage
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\begin{algorithm}[H]
+\caption{Simple actor critic algorithm with 1-step return}
+\label{alg:ac_methods}
+\begin{algorithmic}[1]
+\STATE Choose initial $\theta_0, \phi_0$.
+\STATE Sample first state $s_0 \sim \mu$
+\FOR{$t$ in $\{0,\ldots, T\}$ }
+\STATE \textit{// Interact with the environment}
+\STATE $a_t \sim \pi_{\theta_t}(\cdot | s_t)$
+\STATE $s_{t+1}, r_t \sim \penv(\cdot, \cdot | s_t, a_t)$
+\STATE \textit{// Policy evaluation}
+\STATE $\phi_{t+1} = \phi_t - \eta_\phi \cdot \big(r_t + \gamma V_{\phi_t}(s_{t+1}) - V_{\phi_t}(s)\big) \nabla_{\phi_t}V_{\phi_t}(s) $
+\STATE \textit{// Policy improvement}
+\STATE $\theta_{t+1} = \theta_t + \eta_\theta \cdot \big( r_t + \gamma V_{\phi_t}(s_{t+1}) - V_{\phi_t}(s)\big) \nabla_{\theta_t} \log \pi_{\theta_t}(a|s)$ 
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\end{center}
+\vspace{1em}
+
+\subsubsection{Policy greedification and value-based methods}
+Greedification is a totally different method that allows us to derive policies directly from $Q$-functions and as such we do not need to parameterize $\pi$ by $\theta$.
+We define the \emph{greedy} policy $\pi'$ with respect to $Q^\pi$ as
+\begin{equation}
+\label{eq:greedification}
+    \pi'(a|s) = \mathbf{1}_{\{a=\arg \max_\alpha Q^\pi(s,\alpha)\} }(a)
+\end{equation}
+Thus the greedy policy is a deterministic policy which places all of its probability on the best action according to $Q^\pi$. It can be shown~\citep{sutton18book} that the greedy policy is an improvement over $\pi$, we have $V^{\pi'}(s) \ge V^\pi(s)\ \forall s$, in particular $\gJ(\pi') \ge \gJ(\pi)$.
+
+SARSA and Q-Learning~\citep{watkins1992q} are examples of well-known \emph{value-based} algorithms: both learn an approximate value function using Temporal Difference learning and then perform a greedification step using the current $Q$ function estimate. While SARSA performs the TD step on the current policy $\pi$ (i.e its 1-step return target would be $r(s_t, a_t) + \gamma Q_\phi(s_{t+1}, a_{t+1})$ where $a_{t+1} \sim \pi(\cdot|s_{t+1})$), on the other hand Q-Learning uses a target with a look-ahead step as the next action is sampled from $\pi'$, thus the target is  $r(s_{t}, a_t) + \gamma Q_\phi(s_{t+1}, a'), \ a' \sim \pi'(\cdot|s_{t+1})$ or equivalently $r(s_t, a_t) + \gamma \max_a Q_\phi(s_{t+1}, a)$ as $\pi'$ is the greedy policy.
+
+
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\begin{algorithm}[H]
+\caption{Q-learning}
+\label{alg:q_learning}
+\begin{algorithmic}[1]
+\STATE \textit{// Initialize starting state and Q network}
+\STATE $s_0 \sim \mu(\cdot)$
+\STATE Initialize $\phi_0$
+\FOR{$t$ in $\{0,\ldots,\infty\}$}
+\STATE \textit{// Sample and execute action}
+\STATE $a_t \sim \pi_{\epsilon-\text{greedy}}( Q_{\phi_t}(s_t, \cdot))$
+\STATE $s_{t+1}, r_t \sim \penv(\cdot | s_t, a_t)$
+\STATE \textit{// Temporal Difference update on the greedy policy}
+\STATE $\phi_{t+1} \leftarrow {\phi_t} + \alpha \big( r_t + \gamma \max_{a'} Q_{\phi_t}(s_{t+1}, a') - Q_{\phi_t}(s_t, a_t) \big) \nabla_{\phi_t} Q_{\phi_t}(s_t, a_t) $
+\ENDFOR
+
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\end{center}
+Note here that in the algorithm we sampled actions from $\pi_{\epsilon-\text{greedy}}$. While we could sample greedily from $Q$ by taking its argmax, it is common practice to use a more random $\epsilon$-greedy policy that has a $\epsilon$ probability of sampling other actions as well. This enables us to \emph{explore} actions and states we might not have encountered otherwise. We will discuss briefly the exploration problem in~\Cref{subsubsec:exploration}.
+
+This algorithm has been very successful, and Deep Q-Learning~\citep{mnih2013playing}, a slightly modified version of this algorithm for deep reinforcement learning was the first algorithm to reach human level performance on the ALE benchmark~\citep{bellemare2013arcade}.
+
+
+\subsubsection{General conditions for improvement} 
+While policy gradient-based methods and greedification-based ones are conceptually different, it is still possible to understand them as optimizing the same objective for our policy.
+
+We can write a more general, non-local, version of the policy gradient theorem to compare more generally two policies $\pi'$ and $\pi$ using a variant of the performance difference lemma~\citep{kakade2002approximately}
+\begin{equation}
+    \gJ(\pi') - \gJ(\pi) = \E_{s \sim d^{\pi'}_\gamma} \big[ \sum_a \big(\pi'(a|s)-\pi(a|s)\big) Q^\pi(s,a)\big]
+\end{equation}
+This equation is a generalization of the policy gradient theorem as taking the limit $\lim_{t\to 0} \frac{\gJ(\theta+t \delta \theta)-\gJ(\theta)}{t}$ would lead back to the policy gradient. Alternatively, as $d^{\pi'}_\gamma$ is always positive, we could look for the policy $\pi'$ that maximizes $ \sum_a \big(\pi'(a|s)-\pi(a|s)\big) Q^\pi(s,a)$, which is achieved for the greedy policy of \Cref{eq:greedification}. Thus with one unified objective we can understand how the two main methods for policy improvement are related. While policy gradient chooses infinitesimal step to increase the return, greedification performs more drastic updates by directly transitioning to the greedy policy.
+
+\subsubsection{Exploration}
+\label{subsubsec:exploration}
+The drastic updates of the greedification exemplify one of the main challenges of reinforcement learning. Let's say we are in a bandit setting, \emph{id est} there is only one state and we have to find the action that leads to the best reward. It may be that our initial guess is wrong because of the stochasticity of the reward function. For instance if our action is to choose which restaurant we would like to eat at, we may not be able to identify the best restaurant overall by only tasting one item from the menu. Therefore to be able to identify the best action, we need to \emph{explore} enough each possibility in order to find the optimal policy. This is at odds with greedification which purely \emph{exploits} based on our current guess of what the value of each action is. This tradeoff between \emph{exploration}, taking suboptimal actions in order to potentially discover better ones, and \emph{exploitation}, taking the best action we know in order accumulate reward, is at the heart of reinforcement learning. While exploration is an active research topic, we will only mention here the two simplest and most widely used schemes for policy gradient and Q-learning.
+
+For actor-critic and policy gradient methods, it is common to add an \emph{entropy bonus} $H(a|s)$, which measures the randomness of the action distribution, to the reward in order to encourage our policy to try out different actions. For value-based methods using a greedification step, the most common strategy for exploration is using an $\epsilon$-greedy policy, ie, we select the argmax with probability $1-\epsilon$ and another action at random with probability $\epsilon$. $\epsilon$ is typically decayed over time so that the policy ultimately becomes the greedy policy.
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

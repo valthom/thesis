@@ -1,0 +1,18 @@
+\scalebox{.6}{
+\begin{tikzpicture}
+\node[inner sep=0pt] (im0) at (0,0)
+    {\fbox{\includegraphics[width=.25\textwidth]{articles/icf/figures/im0_good.png}}};
+\node[inner sep=0pt] (im1) at (5,0)
+    {\fbox{\includegraphics[width=.25\textwidth]{articles/icf/figures/im1_good.png}}};
+
+
+\node[] (ht) at (0,-4) {$\underbrace{h}_{(0.4,\ 13.1)}$};
+\node[] (ht1) at (7,-4) {$\underbrace{\hat{h'}}_{(-4.6,\ -1.9)} = h + \underbrace{dh_{{\color{right} {\color{right} right}}}}_{(5,\ -5)} + \underbrace{2\cdot dh_{{\color{down} down}}}_{(-10,\ -10)}$}; 
+    \draw[->,thick] (im0.south) -- (ht.north)
+    node[midway,fill=white] {Encoder};
+    \draw[->,thick] (5, -3.3) -- (im1.south)
+    node[midway,fill=white] {Decoder};
+    
+    \draw[->,thick] (ht.east) -- (ht1.west);
+    
+\end{tikzpicture}}

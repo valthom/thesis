@@ -1,0 +1,49 @@
+  
+  
+
+    
+        
+
+\begin{tikzpicture}
+\tikzstyle{main}=[circle, minimum size = 12mm, thick, draw =black!80, node distance = 8mm]
+\tikzstyle{connect}=[-latex, thick]
+\tikzstyle{connect}=[-latex, thick]
+\tikzstyle{box}=[rectangle, draw=black!100]
+  \node[main, fill=alpha] (x1) {$\traj_1$};
+  
+  \node[main, fill=alpha] (xtm1) [right=of x1] {$\traj_{h-1}$};
+  \node[main, fill=alpha] (xt) [right=of xtm1] {$\traj_h$};
+  \node[main, fill=beta] (xtp1) [right=of xt] {$\traj_{h+1}$};
+  \node[main, fill=beta] (xT) [right=of xtp1] {$\traj_{T}$};
+  
+  
+  \node[main, fill=alpha] (O1) [right=of Observed,above=of x1] {$\gO_1$};
+  \node[main, fill=alpha] (Otm1) [right=of O1,above=of xtm1] {$\gO_{h-1}$};
+  \node[main, fill=alpha] (Ot) [right=of Otm1,above=of xt] {$\gO_h$};
+  \node[main,fill=beta] (Otp1) [right=of Ot,above=of xtp1] {$\gO_{h+1}$};
+  \node[main,fill=beta] (OT) [right=of Otp1,above=of xT] {$\gO_T$};
+
+  \path (x1) edge [connect] (O1);
+  \path (x1) edge [connect, dashed] (xtm1);
+  \path (xtm1) edge [connect] (Otm1)
+        (xtm1) edge [connect] (xt)
+        ;
+    \path (xt) edge [connect] (Ot)
+        (xt) edge [connect] (xtp1)
+        ;    
+    \path (xtp1) edge [connect] (Otp1);
+        ;  
+    \path (xtp1) edge [connect, dashed] (xT);
+    \path (xT) edge [connect] (OT);
+        ;    
+    
+        
+  \path (xt) edge [connect] (Ot);
+
+  \draw[dashed]  [below=of L1,above=of O1];
+  \draw[ultra thick,->] (0,-1) -- (4.5,-1) node[anchor=north] {};
+  \draw[ultra thick,->] (8,-1) -- (5.5,-1) node[anchor=north] {};
+
+    \node[] (alpha) at (2.5, -1.5) {$p(\traj_{1:h}|\gO_{1:h})$};
+  \node[] (alpha) at (6.5, -1.5) {$p(\gO_{h+1:T}|\traj_{h})$};
+\end{tikzpicture}

@@ -1,0 +1,37 @@
+\chapter*{Notation}
+In this thesis we will use the convention of denoting matrices with capital bold letters. Vectors and scalars will be denoted by lowercase letters and the distinction will be made clear from context.
+\begin{table}[H]%
+\begin{center}%
+\begin{tabular}{r c p{10cm} }
+\toprule
+$\theta$ & $\triangleq$ & Learnable parameters of a model\\
+$\mathcal{L}$ & $\triangleq$ & Loss function\\
+$V$  & $\triangleq$ & value function.\\
+$\KL$ & $\triangleq$ & Kullback-Leibler Divergence. \\
+$a$  & $\triangleq$ & Actions\\
+$r$  & $\triangleq$ & Actions\\
+$a$  & $\triangleq$ & Actions\\
+
+
+
+
+$\traj_{1:T}$ & $\triangleq$ & $\{\rvs_i, \rva_i\}_{i=1}^T$ the state-action pairs.\\
+
+$\mathcal{O}_t$ & $\triangleq$ & Optimality variable.\\
+$p(\mathcal{O}_t|\rvs_t, \rva_t)$ & $\triangleq$ & $\exp(r(\rvs_t, \rva_t))$ Probability of a pair state action of being optimal.\\
+$\penv$ & $\triangleq$ & Transition probability of the environment. Takes state and action $(\rvs_t, \rva_t)$ as argument and return next state and reward $(\rvs_{t+1}, r_t)$.\\
+$\pmodel$ & $\triangleq$ & Model of the environment. Takes state and action $(\rvs_t, \rva_t)$ as argument and return next state and reward $(\rvs_{t+1}, r_t)$.\\
+$w_t$ & $\triangleq$ & Importance sampling weight.\\ 
+$p(\traj)$  & $\triangleq$ & Density of interest.\\
+$q(\traj)$  & $\triangleq$ & Approximation of the density of interest.\\
+$t \in \{1, \ldots T\}$ & $\triangleq$ & time steps. \\
+$n \in \{1, \ldots N\}$ & $\triangleq$ & particle number. \\
+$h$ & $\triangleq$ & horizon length. \\
+
+\bottomrule
+\end{tabular}
+\end{center}
+\label{tab:notation}
+\end{table}
+
+

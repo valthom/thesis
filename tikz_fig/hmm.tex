@@ -1,0 +1,42 @@
+\begin{tikzpicture}
+\tikzstyle{main}=[circle, minimum size = 5mm, thick, draw =black!80, node distance = 7mm]
+\tikzstyle{connect}=[-latex, thick]
+\tikzstyle{box}=[rectangle, draw=black!100]
+  \node[box,draw=white!100] (Latent) {\textbf{Latent}};
+  \node[main] (a1) [right=of Latent] {$\va_1$};
+  \node[main] (s1) [below=of a1] {$\vs_1$};
+  \node[draw,thick, rounded corners, fit=(s1) (a1)] (L1) {};
+  \node[main] (a2) [right=of a1] {$\va_2$};
+  \node[main] (s2) [below=of a2] {$\vs_2$};
+  \node[draw,thick, rounded corners, fit=(s2) (a2)] (L2) {};
+  \node[main] (a3) [right=of a2] {$\va_3$};
+  \node[main] (s3) [below=of a3] {$\vs_3$};
+  \node[draw,thick, rounded corners, fit=(s3) (a3)] (L3) {};
+  \node[main] (at) [right=of a3] {$\va_t$};
+  \node[main] (st) [below=of at] {$\vs_t$};
+  \node[draw,thick, rounded corners, fit=(st) (at)] (Lt) {};
+  
+  
+  \node[box,draw=white!100] (Observed) [above=of Latent] {\textbf{Observed}};
+  \node[main,fill=black!10] (O1) [right=of Observed,above=of L1] {$\gO_1$};
+  \node[main,fill=black!10] (O2) [right=of O1,above=of L2] {$\gO_2$};
+  \node[main,fill=black!10] (O3) [right=of O2,above=of L3] {$\gO_3$};
+  \node[main,fill=black!10] (Ot) [right=of O3,above=of Lt] {$\gO_t$};
+
+  \path (L3) -- node[auto=false]{\ldots} (Lt);
+  \path (a1) edge [connect] (O1)
+        (s1) edge [connect, bend right=45] (O1)
+        (s1) edge [connect] (s2)
+        (a1) edge [connect] (s2);
+    \path (a2) edge [connect] (O2)
+        (s2) edge [connect, bend right=45] (O2)
+        (s2) edge [connect] (s3)
+        (a2) edge [connect] (s3);
+  \path (a3) edge [connect] (O3)
+        (s3) edge [connect, bend right=45] (O3);
+  \path (at) edge [connect] (Ot)
+        (st) edge [connect, bend right=45] (Ot);
+  \path (L3) -- node[auto=false]{\ldots} (Lt);
+
+  \draw[dashed]  [below=of L1,above=of O1];
+\end{tikzpicture}

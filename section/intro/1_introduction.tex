@@ -1,0 +1,39 @@
+\chapter{Introduction}
+Learning through interaction is a fundamental aspect of natural intelligence: humans and animals learn from their experience in order to develop complex behaviors. For this reason, a primary long-term goal in the field of artificial intelligence is to create machines capable of emulating this process, able to interact with our world to perform specific tasks or achieve general objectives. Reinforcement learning (RL) is a key paradigm for learning how to interact; it is a subfield of machine learning in which an agent learns to act through trial and error. This approach has demonstrated promising results in various applications, such as games~\citep{tesauro1994td, mnih2013playing, silver2016mastering} and robotics \citep{levine2018learning}.
+
+Many concepts in reinforcement learning share connections with other fields. For instance, the concept of rewards and punishments in RL is closely related to the dopamine system in the brain \citep{schultz1997neural}. This analogy later inspired the Temporal Difference algorithm~\citep{sutton1988learning}, which we will explain in \Cref{sec:RL}. Some researchers explore the intersection between psychology and reinforcement learning, as there are parallels between animal learning through conditioning and the learning process of RL agents \citep{sutton1981toward}. Reinforcement learning is also strongly linked to fundamental notions in optimal control, such as Bellman equations \citep{bellman1954theory, bellman1959adaptive}, which eventually led to the development of highly successful algorithms like Q-Learning~\citep{watkins1992q}.
+
+In optimal control, most algorithms are \emph{planning algorithms}. They aim to determine the optimal course of action by considering hypothetical situations, often without direct interaction with the environment. In planning, an agent uses a model of the environment, either learned or provided, to simulate potential state transitions and rewards, thereby improving its policy for better decision-making. Planning methods hold significant importance in RL, with notable examples like Monte Carlo Tree Search (MCTS), an algorithm that constructs a search tree of potential state-action trajectories to determine the optimal action for the current state.
+
+However these methods rely on a model of the world which is often unknown, and estimating it can be a challenging task. \emph{Learning algorithms} often refer to methods that do not need extra simulated experience but only learn from direct trial and error. Through this process, the agent incrementally updates its knowledge about the environment, often represented as value functions (e.g., state-value or action-value functions) or policy parameters. Over time, as the agent accumulates more experience, it can refine its policy to better navigate the environment and achieve higher rewards. Some popular learning algorithms include Q-learning, SARSA, and various policy gradient methods.
+
+In this thesis, we are interested in learning and planning algorithms in the presence of stochasticity. First we will present briefly some notions of information theory, optimization and reinforcement learning useful to understand the four contributions presented in the subsequent chapters.%
+
+Our first contribution in "learning disentangled independently controllable factors of variation"~\citep{bengio2017independently, thomas2017independently, thomas2018disentangling} addresses the issue of how an agent, without any specified goal, can comprehend its environment by interacting with it, discovering controllable elements, and constructing useful internal representations of these aspects of the world. We propose and investigate a direct mechanism, inspired from how children learn, that explicitly connects an agent's control over its environment to its internal feature representations. We then show how these jointly learned policies and \emph{independently controllable factors} lead to learning a disentangled latent representation that can be used for planning. 
+
+
+
+However, even when the agent is able to build an appropriate representation or model of the world, how to use it to decide which action to take is another challenge.
+We tackle this one with our second work ``Probabilistic planning with sequential Monte Carlo Methods'' by designing a novel planning algorithm. By interpreting the set of solutions to a task as a distribution as in \textit{control as inference}~\citep{toussaint2006probabilistic, toussaint2009robot, levine2018reinforcement}, we show how we can use a particle filter method to estimate this distribution. This yield an new, intuitive and theoretically grounded algorithm for planning in stochastic continuous domains.
+
+Our next two contributions are concerned with the process of learning itself and how it can be affected by noise. The third paper we present examines the role that gradient noise and local curvature can have on the optimization speed and the generalization of a model. We show how a simple metric can measure capacity of a model more effectively that the raw number of parameters.
+In our fourth and last contribution, we investigate the role of gradient noise for policy gradient methods in bandits and RL. More specifically we take a closer look at \emph{baselines}, an ubiquitous algorithmic choice in policy gradient methods motivated by variance reduction purposes. In accordance with classical optimization theorems, the prevailing view among researchers is that gradient noise leads to slower convergence in RL as well. However, in this paper, we show that this view is flawed and that there is an important interplay between the gradient noise and the propensity of the agent to try new actions, which can ultimately lead to discovering better policies.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

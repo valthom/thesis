@@ -1,0 +1,20 @@
+\scalebox{.6}{
+\begin{tikzpicture}
+\node[inner sep=0pt] (im0) at (0,0)
+    {\fbox{\includegraphics[width=.25\textwidth]{articles/icf/figures/im_causal0_good.png}}};
+\node[inner sep=0pt] (im1) at (5,0)
+    {\fbox{\includegraphics[width=.25\textwidth]{articles/icf/figures/im_causal1_good.png}}};
+
+
+\node[] (ht) at (0,-3.5) {$\underbrace{h_1}_{(0.4,\ 13.1)}$};
+\node[] (ht1) at (5,-3.5) {$\underbrace{h_2}_{(5.9,\ -11.6)}$}; 
+\node[] (dh) at (2.5,-5) {$dh ={(5.5,\ -24.8)} \approx 2\cdot dh_{{\color{down} down}} + 3\cdot dh_{{\color{right} right}}$};
+    \draw[->,thick] (im0.south) -- (ht.north)
+    node[midway,fill=white] {Encoder};
+    \draw[<-,thick] (ht1) -- (im1.south)
+    node[midway,fill=white] {Encoder};
+    
+    \draw[->,thick] (ht.east) -- (dh.north);
+     \draw[->,thick] (ht1.west) -- (dh.north);
+    
+\end{tikzpicture}}

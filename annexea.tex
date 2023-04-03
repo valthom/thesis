@@ -1,0 +1,123 @@
+ \debutannexes
+  \annexe{Independently controllable factors}
+\section{Variational bound and the selectivity}
+\label{appendix:bound}
+Let us call $p(h_{t+1} | \phi_{t+1}, h_t) =  \mathcal{P}^\phi_{h' ,h}$ the probability distribution over final hidden states starting from $h$ and using the policy parametrized by the embedding $\phi$.
+
+$p(h_{t+1} | \phi_{t+1}, h_t) = \Pi_{k=1}^{K}  \pi_{\phi_{t+1}}( a_{t+\frac{k-1}{K}} | h_{t+\frac{k-1}{K}}) p_{env}(s_{t+\frac{k}{K}} | a_{t+\frac{k-1}{K}}, s_{t+\frac{k-1}{K}})$.
+where $p_{env}$ is the transition probability of the environment.
+
+For simplicity, let's refer to $h_t$ as $h$, $h_{t+1}$ as $h'$ and $\phi_{t+1}$ as $\phi$.
+\subsection{Lower bound on the mutual information}
+The bound $$\mathcal{I}_p(\phi, h' | h) \ge \sup_\theta  \mathbb{E}_{p(\phi|h)} \big[ \mathcal{S}(h, \phi)\big]$$ can be proven by using Donsker-Varadhan variational representation of the KL divergence \citep{donsker1975asymptotic,ruderman2012tighter}:
+
+$$\kl{p}{q} = \sup_{T \in \mathcal{L}^\infty(q)} \mathbb{E}_p \big[ T  \big] - \log \mathbb{E}_q \big[ e^T \big]$$
+
+For $A = e^T$ and using the identity $\mathcal{I}_p(X, Y) = \mathbb{E}_{p(y)} \big[ \kl{p(x|y)}{p(x)}\big]$ with $X=\phi|h$ and $Y=h'|h$, we have:
+
+\begin{eqnarray*}
+\mathcal{I}_p(\phi, h' | h) &=& \mathbb{E}_{h'|h} \sup_A \mathbb{E}_{\phi|h, h'} \big[ \log A(h', h, \phi) \big] - \log \mathbb{E}_{\varphi|h} \big[ A(h', h, \varphi) \big]\\
+&=& \mathbb{E}_{h'|h} \sup_A \mathbb{E}_{\phi|h, h'} \big[ \log \frac{ A(h', h, \phi)}{\mathbb{E}_{\varphi|h} \big[ A(h', h, \varphi)\big]}\big]\\
+&\ge&  \sup_A \mathbb{E}_{\phi|h}\mathbb{E}_{h'|\phi, h} \big[ \log \frac{ A(h', h, \phi)}{\mathbb{E}_{\varphi|h} \big[ A(h', h, \varphi)\big]}\big]\\
+&\ge&  \sup_\theta \mathbb{E}_{\phi|h}\mathbb{E}_{h'|\phi, h} \big[ \log \frac{ A(h', h, \phi; \theta)}{\mathbb{E}_{\varphi|h} \big[ A(h', h, \varphi; \theta)\big]}\big]\\
+\end{eqnarray*}
+for parametric $A$ functions.
+
+
+
+
+As we sample the factors $\phi$ uniformly, our total objective is then a lower bound on $\sum_t \mathcal{I}(\phi_t, h_t | h_{t-1})$ which corresponds here to the \emph{directed information} \citep{massey1990causality} \cite{ziebart2010modeling} as $\phi_t$ is sampled independently from $\phi_{1:t-1}$.
+
+
+
+
+\section{Additional information on the training}
+
+In our experiments, we use the selectivity objective, an autoencoding loss and an entropy regularization loss $\mathcal{H}(\pi_\phi)$ for each of the policies $\pi_\phi$. Furthermore, in experiment 4.2 we added the model-based cost $||h' - T(h, \phi)||^2$ with $T$ a learned two layer fully connected neural network.
+
+The selectivity is used to update the parameters of the encoder, factor generator and policy networks.
+We use the following equation for computing the gradients
+
+$$\nabla_\theta \mathbb{E}_{\pi_\theta} \big[ f_\theta \big] =  \mathbb{E}_{\pi_\theta} \big[ \nabla_\theta f_\theta + f_\theta \nabla_\theta \log \pi_\theta \big]$$ 
+We also use a state dependent baseline $V$ as a control variate to reduce the variance of the REINFORCE estimator.
+
+Furthermore, to be able to train the factor generator efficiently, we train all $\phi$ sampled in a mini-batch (of size $1024$) by importance sampling on the probability ratio of the trajectory under each $\phi$
+ 
+ 
+\annexe{Sequential Monte Carlo Planning Appendix} \label{appendix:one}
+
+\section{The Action Prior}
+\label{app:action_prior}
+
+The true joint distribution~\ref{eq:posterior_target} should actually be written:
+\begin{eqnarray*}
+\label{eq:true_posterior_target}
+p(\traj_{1:T}, \gO_{1:T}) &=& \mu(\rvs_1) \prod_{t=1}^{T-1} \penv(\rvs_{t+1}|\rva_t, \rvs_t) \prod_{t=1}^{T} p(\rva_t) \exp\big(\sum_{t=1}^{T} r(\rvs_t, \rva_t)\big) \\
+&=& \mu(\rvs_1) \prod_{t=1}^{T-1} \penv(\rvs_{t+1}|\rva_t, \rvs_t)\exp\big(\sum_{t=1}^{T} r(\rvs_t, \rva_t) + \log p(\rva_t)\big) \\
+\end{eqnarray*}
+In Mujoco environments, the reward is typically written as 
+$$r(\rvs_t, \rva_t) = f(\rvs_t) - \alpha ||\rva_t||_2^2 $$
+where $f$ is a function of the state (velocity for HalfCheetah on Mujoco for example). The part $\alpha ||\rva_t||_2^2$ can be seen as the contribution from the action prior (here a gaussian prior).
+One can also consider the prior to be constant (and potentially improper) so that is does not change the posterior $p(\traj_{1:T}| \gO_{1:T})$.
+
+
+\section{Value Function: Backward Message}
+ \label{app:backward_message}
+\begin{align}
+    p(\gO_{t+1:T} | \traj_t) &=  \int_{\traj_{t+1}} p(\gO_{t+1:T}, \traj_{t+1} | \traj_t)d\traj_{t+1} \nonumber\\
+     &=  \int_{\traj_{t+1}} p(\traj_{t+1} | \traj_{t}, \gO_{t+1:T}) p(\gO_{t+1:T} | \traj_{t+1}) d\traj_{t+1}  \nonumber\\
+     &= \int_{\rvs_{t+1}}  \penv(\rvs_{t+1} | \rvs_t, \rva_t) \left[ \int_{\rva_{t+1}} p(\rva_{t+1} | \rvs_{t+1}, \gO_{t+1:T}) \exp Q(\rvs_{t+1}, \rva_{t+1}) d\rva_{t+1}  \right] d\rvs_{t+1}\nonumber\\
+     &= \int_{\rvs_{t+1}} \penv(\rvs_{t+1} | \rvs_t, \rva_t)  \exp \big( V(\rvs_{t+1}) \big) d\rvs_{t+1}\nonumber\\
+       &= \E_{\rvs_{t+1} | \rvs_t, \rva_t} [ \exp \big( V(\rvs_{t+1}) \big)]
+\end{align}
+By definition of the optimal value function in~\citep{levine2018reinforcement}.
+
+
+\section{Recursive Weights Update}
+
+
+\label{app:rec_weights}
+\begin{align}
+w_t &= \frac{p(\traj_{1:t} | \gO_{1:T})}{q(\traj_{1:t})} \nonumber\\
+&= \frac{p(\traj_{1:t-1} | \gO_{1:T})}{q(\traj_{1:t-1})}\frac{p(\traj_t |\traj_{1:t-1}, \gO_{1:T})}{q(\traj_t | \traj_{1:t-1})} \nonumber\\
+&= w_{t-1} \cdot \frac{p(\traj_t |\traj_{1:t-1}, \gO_{1:T})}{q(\traj_t | \traj_{1:t-1})} \nonumber\\
+&= w_{t-1} \frac{1}{ q(\traj_t | \traj_{1:t-1})} \frac{p(\traj_{1:t} | \gO_{1:T})}{ p(\traj_{1:t-1} | \gO_{1:T})} \nonumber\\
+&\text{We use there the forward-backward Equation~\ref{eq:forwardbackward} for the numerator and the denominator} \nonumber\\
+ &\propto w_{t-1}   \frac{1}{ q(\traj_t | \traj_{1:t-1})} \frac{ \textcolor{orange}{p(\traj_{1:t} | \gO_{1:t})}}{ \textcolor{orange}{p(\traj_{1:t-1} | \gO_{1:t-1})}} \frac{ \textcolor{beta}{p(\gO_{t+1:T} | \traj_{t})}}{ \textcolor{beta}{p(\gO_{t:T} | \traj_{t-1})}}   \nonumber\\
+&= w_{t-1}   \frac{ p(\traj_t | \traj_{1:t-1})}{ q(\traj_t | \traj_{1:t-1})}  p(\gO_t | \traj_t)   \frac{ p(\gO_{t+1:T} | \traj_{t})}{ p(\gO_{t:T} | \traj_{t-1})}  \nonumber\\
+&= w_{t-1}    \frac{\penv(\rvs_{t} | \rvs_{t-1}, \rva_{t-1})}{ \pmodel(\rvs_{t} | \rvs_{t-1}, \rva_{t-1}) }   \frac{\exp (r_t)}{\pi_\parampol(\rva_t|\rvs_t)} \frac{\E_{\rvs_{t+1} | \rvs_t, \rva_t} [ \exp \big( V(\rvs_{t+1}) \big)] }{\E_{\rvs_{t} | \rvs_{t-1}, \rva_{t-1}} [ \exp \big( V(\rvs_{t}) \big)]}  \nonumber\\
+&= w_{t-1} \frac{\penv(\rvs_{t} | \rvs_{t-1}, \rva_{t-1})}{ \pmodel(\rvs_{t} | \rvs_{t-1}, \rva_{t-1}) }  \E_{\rvs_{t+1} | \rvs_t, \rva_t} [ \exp \big( r_t  -  \log \pi_\parampol(\rva_t | \rvs_t) + V(\rvs_{t+1}) -\\
+&\hspace{3cm}\log \E_{\rvs_{t} | \rvs_{t-1}, \rva_{t-1}} [ \exp \big( V(\rvs_{t}) \big)] \big)] \nonumber
+\end{align}
+
+
+\section{Sequential Importance Sampling Planning}
+\label{app:sis_algo}
+
+
+
+\begin{algorithm}[H]
+\caption{SMC Planning using SIS}
+\label{alg:sis_planning}
+\begin{algorithmic}[1]
+\FOR{$t$ in $\{1,\ldots,T\}$}
+\STATE $\{ \rvs^{(n)}_t = \rvs_t\}_{n=1}^N$
+\STATE  $\{w^{(n)}_t =1\}_{n=1}^N$
+\FOR{$i$ in $\{t,\ldots,t+h\}$}
+\STATE \textit{// Update}
+\STATE $\{\rva^{(n)}_{i} \sim \pi(\rva^{(n)}_{i}|\rvs^{(n)}_{i})\}_{n=1}^N$
+\STATE $\{\rvs^{(n)}_{i+1}, r^{(n)}_{i} \sim \pmodel(\cdot | \rvs^{(n)}_{i}, \rva^{(n)}_{i})\}_{n=1}^N$
+\STATE $\{w_i^{(n)} \propto w^{(n)}_{i-1} \cdot \exp \big( A(\rvs^{(n)}_{i}, \rva^{(n)}_{i}, \rvs^{(n)}_{i+1}) \big) \}_{n=1}^N$
+\ENDFOR
+\STATE Sample $n \sim \text{Categorical}(w_{t+h}^{(1)}, \ldots, w_{t+h}^{(N)})$.
+\STATE \textit{// Model Predictive Control}
+\STATE Select $\rva_t$, first action of $\traj^{(n)}_{t:t+h}$
+\STATE $\rvs_{t+1}, r_t \sim p_{\text{env}}(\cdot|\rvs_t, \rva_t)$
+\STATE Add $(\rvs_t, \rva_t, r_t, \rvs_{t+1})$ to buffer $\mathcal{B}$
+\STATE Update $\pi$, $V$ and $\pmodel$ with $\mathcal{B}$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+
+

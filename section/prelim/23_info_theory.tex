@@ -1,0 +1,143 @@
+\section{Information theory}
+\label{sec:infoth}
+How to quantify information and discrepancies between probability distributions is at the heart of machine learning and an important prerequisite for understanding our contributions of \Cref{chapter:icf}, \Cref{chapter:smcp} and \Cref{chapter:hfc}.
+
+\subsection{Probability distribution and density/mass function}
+For simplicity, in this section, we will not introduce the notion of probability distribution in its most general form using measure theory, but only using probability density functions. For a more complete treatment, please refer to~\citet{kolmogorov2018foundations, billingsley2008probability}.
+
+\begin{definition}[Probability Mass Function (pmf)]
+Let us consider a discrete random variable $X \in \gX$ where $\gX$ is discrete and a function $p: \gX \mapsto \R$. We say that $p$ is the probability mass function of $X$ if
+\begin{enumerate}
+    \item $p(x) \ge 0, \forall x \in \gX$
+    \item $\sum_{x \in \gX} p(x) = 1$
+    \item $\mathbb{P}(X = x) = p(x)$
+\end{enumerate}
+\end{definition}
+
+In the context of continuous random variables, we can define the notion of \emph{probability density function} which has a very similar definition.
+\begin{definition}[Probability Density Function (pdf)]
+Let us consider a random variable $X \in \gX$ and a function $p: \gX \mapsto \R$. We say that $p$ is the probability density function of $X$ if
+\begin{enumerate}
+    \item $p(x) \ge 0, \forall x \in \gX$
+    \item $\int_\gX p(x) dx = 1$
+    \item $\mathbb{P}(a \le X \le b) = \int_a^b p(x) dx$
+\end{enumerate}
+\end{definition}
+
+We will make use of this concept extensively as most machine learning methods can be understood as trying to approximate a distribution $p$ (for instance the data distribution) with an approximate distribution $q$.
+
+
+
+\subsection{Divergences}
+While distances are the typical notion used for comparing mathematical objects, a weaker notion, called divergences are often used to compare probability measures.
+
+
+
+\begin{definition}[Distance]
+A function $d$ on a set $\gX$ between two objects $x$ and $y \in \gX$ must satisfy four properties to be a distance
+\begin{enumerate}
+    \item \emph{non-negativity:} $d(x, y) \ge 0$
+    \item \emph{identity of indiscernibles:} $d(x,y) = 0$ if and only if $x = y$
+    \item \emph{symmetry:} $d(x,y) = d(y,x)$
+    \item \emph{triangle inequality:} $\forall z \in \gX, \ d(x, y) \le d(x,z) + d(z, y) $
+\end{enumerate}
+\end{definition}
+
+A divergence, on the other hand, only requires the \emph{non-negativity} and \emph{identity of the indiscernibles} properties and is defined for probability distributions.
+
+\begin{definition}[Divergence]
+A function $\gD(\cdot || \cdot)$ between two distributions $p$ and $q$ must satisfy two properties to be a divergence
+\begin{enumerate}
+    \item \emph{non-negativity:} $\gD(p||q) \ge 0$
+    \item\emph{identity of indiscernibles:} $\gD(p||q) = 0$ if and only if $p = q$
+\end{enumerate}
+\end{definition}
+
+
+The most emblematic divergence, especially in machine learning and generally Maximum Likelihood Estimation (MLE) is certainly the Kullback-Leibler divergence~\citep{kullback1951information, kullback1997information}.
+\begin{example}[Kullback-Leibler divergence] The Kullback-Leibler divergence is defined by
+\begin{equation}
+\label{eq:kl}
+    \KL(p||q) = \int_{x \in \gX} p(x) \log \frac{p(x)}{q(x)}  dx
+\end{equation}
+\end{example}
+
+The Kullback-Leibler divergence contains the term $-\int_{x \in \gX}  p(x) \log q(x) dx$ which is the negative log-likelihood of $q$ under the distribution $p$, which is also known as the \emph{cross-entropy}. This divergence is very common in machine learning as we will see in \Cref{sec:ml}.
+
+\subsection{Measures of information}
+Now that we have defined the fundamental notions of probabilities and divergences, we can make us of them to build useful concepts from information theory such as \emph{entropy} or \emph{mutual information}.
+
+
+The notion of entropy is fundamental in physics where it was first introduced by Boltzmann. \citet{shannon1948mathematical} transcribed the concept to communication theory and it is now used widely in statistics and machine learning. For a discrete random variable $X$ with mass function $p$, the entropy $H(X)$ of $X$ is  
+
+\begin{equation}
+\label{eq:entropy}
+    H(X) = - \sum_{x \in \gX} p(x) \log p(x)
+\end{equation}
+
+Entropy should be understood as the \emph{information} necessary to describe $p$. As such, the entropy is always positive $H(X) \ge 0$, it is equal to $0$ only when $p$ is a Dirac function, in that case $p$ does not contain any uncertainty.
+$H(X)$ is also bounded by number of values $X$ can take: $H(X) \le \log | \gX |$ which is achieved when $p$ is the uniform distribution, the distribution with maximal uncertainty. Note that entropy can be defined in the same way for continuous variables, we call this the \emph{differential entropy} $h(X) = - \int_{\gX} p(x) \log (x) dx$ but we lose the upper and lower bounds described above.
+
+Using the notion of Kullback-Leibler divergence notion defined above and by defining the uniform distribution whose probability mass function is $u(x) = \frac{1}{|\gX|}, \ \forall x \in \gX$, we have
+
+\begin{eqnarray*}
+    \KL(p||u) &=& \sum_{x \in \gX} p(x) \log \frac{p(x)}{u(x)} 
+    =\log |\gX| - H(X)
+\end{eqnarray*}
+Thus, entropy can also be interpreted as a measure of how close we are to the uniform distribution.
+
+If we consider the case where we have two random variables $X$ and $Y$ with joint probability mass function $p(x, y)$ and marginals $p(x)$ and $p(y)$ we can write the joint entropy as
+\begin{eqnarray*}
+H(X,Y) &=& - \sum_{x, y} p(x,y) \log p(x,y)\\ 
+ &=& - \sum_{x, y} p(x,y) \big(\log p(y|x) - \log p(x) \big)\\ 
+  &=& - \sum_x p(x) \sum_{y} p(y|x) \log p(y|x) - \sum_x p(x) \log p(x)\\ 
+  &=& H(Y|X) + H(X)
+\end{eqnarray*}
+ where we defined $H(Y|X) = - \sum_x p(x) \sum_{y} p(y|x) \log p(y|x)$, the \emph{conditional entropy}. $H(Y|X)$ should be understood as the amount of information necessary to describe $Y$ given that we know everything about $X$.
+
+Finally we can introduce the idea of \emph{mutual information}, \textit{i.e} how much information is shared between $X$ and $Y$.
+The mutual information $\gI(X, Y)$ can be written in several different manners
+
+\begin{eqnarray*}
+    \gI(X, Y) &=& H(X) + H(Y) - H(X, Y)\\
+    &=& H(X) - H(X|Y)\\
+    &=& \sum_{x, y} p(x,y) \log \frac{p(x,y)}{p(x) p(y)}\\
+    &=& \KL\big(p(x,y)||p(x) p(y)\big)
+\end{eqnarray*}
+see Figure~\ref{fig:mutual_info} for a schematic view.
+
+Another useful interpretation of mutual information is to see it as the divergence between the joint probability and the product of the marginals. When $X$ and $Y$ and conditional independent, the divergence, thus mutual information, is $0$. The concept of mutual information is especially relevant in reinforcement learning where it has been used (in many different ways) as an intrinsic reward signal~\citep{still2012information, mohamed2015variational, gregor2016variational, thomas2018disentangling, eysenbach2018diversity, eslami2018neural}.
+
+
+
+\begin{figure}
+\centering
+\input{figures/mutual_info.tex}
+    \caption{Mutual information is the information shared between $X$ and $Y$. From this Venn diagram, we recover the first two definitions of the mutual information in term of the joint and conditional entropy. For instance the red circle represents the entropy associated to $X$, but as the purple intersection is the mutual information between $X$ and $Y$, the red circle minus the purple intersection represents the uncertainy of $X$ conditioned on us knowing $Y$, i.e $H(X|Y)$.}
+    \label{fig:mutual_info}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
