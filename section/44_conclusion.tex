@@ -1,10 +1,41 @@
  \chapter*{Conclusion}
 
-In this thesis, we have explored the roles and challenges presented by noise in reinforcement learning and optimization algorithms. We have investigated the impact of stochasticity in the learning process and presented four significant contributions that address various aspects of this issue.
+In this thesis, we have explored the roles and challenges presented by
+stochasticity in reinforcement learning and optimization algorithms. We have
+investigated the impact of noise in the learning process and presented four significant contributions that address various aspects of this issue.
+The main axes of our research were the following:
 
-Our first two contributions focused on reinforcement learning in unknown environments, examining how we can design algorithms that leverage the stochasticity of their policy and the environment to their advantage. In the first contribution, we delved into the unsupervised reinforcement learning setting, demonstrating how an agent can learn which aspects of the environment it can control independently, while simultaneously learning a disentangled latent representation of these factors. The second contribution targeted planning in continuous control tasks. By reframing reinforcement learning as an inference problem, we borrowed tools from the Sequential Monte Carlo literature to develop a theoretically grounded and efficient algorithm for probabilistic planning using a learned model of the world, showing how the agent can leverage SMC methods to imagine diverse solutions.
+        \val{Not sure about the name of this first point}
+\begin{itemize}
+    \item \textbf{Learning diverse behaviors for planning:}
+        Our first two articles focused on learning stochastic policies able to
+        explore the environment and discover diverse behaviors. In our first
+        article, \emph{Independently Controllable Factors}, we learn policies,
+        or options, indexed on a latent factor representation $z$. We were able
+        to show that we both learned disentangled representations of the world
+        as well as policies that were able to modify these factors. Finally, we
+        were able to demonstrate how this representation could be used for
+        planning.
+        In our second article, \emph{Sequential Monte Carlo Planning}, we
+        designed a general purpose planning algorithm that can be used in
+        continuous control tasks. Our SMCP algorithm can be view as a maximum
+        entropy planning algorithm and as such can discover stochastic policies
+        discovering diverse solutions.
+    \item \textbf{Understanding the role of noise:} The next two contributions
+        were more focused on understanding the role of noise during the
+        optimization process. In our third article, we analyse the role of the
+        interplay between the gradient noise and the local curvature of the loss
+        function. Specifically, we show it can impact the optimization speed and
+        generalization properties of models trained via maximum likelihood.
+        Finally, in our fourth article, we investigate the role of
+        \emph{baselines} in policy gradient methods. Baselines are often
+        presented as a way to reduce the variance of the gradient estimator
+        without affecting the bias. We show that baselines have an effect beyond
+        variance reduction directly impact the
+        exploration/exploitation trade-off and as such can impact which policies
+        are discovered.
+\end{itemize}
 
-The latter two contributions analyzed the impact of gradient noise due to sampling in optimization algorithms. In our third contribution, we investigated the role of gradient noise in maximum likelihood estimation with stochastic gradient descent, exploring how the structure of the gradient noise and local curvature affect the generalization and convergence speed of the model. Lastly, our fourth contribution revisited reinforcement learning to understand the impact of sampling noise on the policy gradient algorithm. We found that sampling noise can significantly influence the optimization dynamics and the policies discovered in on-policy reinforcement learning.
 
 The work presented in this thesis provides valuable insights into the role of stochasticity in reinforcement learning and optimization algorithms, offering a solid foundation for future research in this area.
 

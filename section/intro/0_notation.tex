@@ -1,37 +1,80 @@
-\chapter*{Notation}
+\chapter*{Notation and acronyms}
 In this thesis we will use the convention of denoting matrices with capital bold letters. Vectors and scalars will be denoted by lowercase letters and the distinction will be made clear from context.
+
+\section*{Notation}
 \begin{table}[H]%
 \begin{center}%
 \begin{tabular}{r c p{10cm} }
 \toprule
-$\theta$ & $\triangleq$ & Learnable parameters of a model\\
+    \multicolumn{3}{l}{\textbf{\underline{Information theory}}} \\
+$X$ & $\triangleq$ & Random variable\\
+$\E$ & $\triangleq$ & Expectation\\
+$H(X)$ & $\triangleq$ & Entropy of $X$\\
+$\gI(X,Y)$ & $\triangleq$ & Mutual information between $X$ and $Y$\\
+$\KL$ & $\triangleq$ & Kullback-Leibler Divergence \\
+
+\midrule
+    \multicolumn{3}{l}{\textbf{\underline{Machine learning and reinforcement
+    learning}}} \\
+$\theta$ or $\phi$ & $\triangleq$ & Learnable parameters of a model\\
 $\mathcal{L}$ & $\triangleq$ & Loss function\\
-$V$  & $\triangleq$ & value function.\\
-$\KL$ & $\triangleq$ & Kullback-Leibler Divergence. \\
-$a$  & $\triangleq$ & Actions\\
-$r$  & $\triangleq$ & Actions\\
-$a$  & $\triangleq$ & Actions\\
-
-
-
-
-$\traj_{1:T}$ & $\triangleq$ & $\{\rvs_i, \rva_i\}_{i=1}^T$ the state-action pairs.\\
-
-$\mathcal{O}_t$ & $\triangleq$ & Optimality variable.\\
-$p(\mathcal{O}_t|\rvs_t, \rva_t)$ & $\triangleq$ & $\exp(r(\rvs_t, \rva_t))$ Probability of a pair state action of being optimal.\\
-$\penv$ & $\triangleq$ & Transition probability of the environment. Takes state and action $(\rvs_t, \rva_t)$ as argument and return next state and reward $(\rvs_{t+1}, r_t)$.\\
-$\pmodel$ & $\triangleq$ & Model of the environment. Takes state and action $(\rvs_t, \rva_t)$ as argument and return next state and reward $(\rvs_{t+1}, r_t)$.\\
-$w_t$ & $\triangleq$ & Importance sampling weight.\\ 
-$p(\traj)$  & $\triangleq$ & Density of interest.\\
-$q(\traj)$  & $\triangleq$ & Approximation of the density of interest.\\
-$t \in \{1, \ldots T\}$ & $\triangleq$ & time steps. \\
-$n \in \{1, \ldots N\}$ & $\triangleq$ & particle number. \\
-$h$ & $\triangleq$ & horizon length. \\
+$\mathcal{J}$ & $\triangleq$ & Objective function to maximize\\
+$s$  & $\triangleq$ & State (vector)\\
+$a$  & $\triangleq$ & Rction (scalar or vector)\\
+$r$  & $\triangleq$ & Reward (scalar) \\
+$R$  & $\triangleq$ & Return (scalar) \\
+$\traj_{1:T}$ & $\triangleq$ & $\{s_i, a_i\}_{i=1}^T$ Trajectory: sequence of state-action pairs\\
+$\pi$ & $\triangleq$ & A policy, i.e a distrubtion over actions given a state\\
+$\gamma$ & $\triangleq$ & Discount factor\\
+$\lambda$ & $\triangleq$ & Trace-decay parameter for TD($\lambda$)\\
+$V^\pi$  & $\triangleq$ & Value function associated to the policy $\pi$\\
+$Q^\pi$  & $\triangleq$ & State-action value function associated to the policy $\pi$\\
+$\mathcal{O}_t$ & $\triangleq$ & Optimality variable used in control as
+    inference\\
+$\penv$ & $\triangleq$ & Transition probability of the environment\\
+$\rmP$ & $\triangleq$ & Transition matrix of the environment\\
+$\pmodel$ & $\triangleq$ & Model of the environment\\
+$w_t$ & $\triangleq$ & Importance sampling weight\\ 
 
 \bottomrule
 \end{tabular}
 \end{center}
 \label{tab:notation}
+\end{table}
+
+\section*{Acronyms}
+\begin{table}[H]%
+\begin{center}%
+\begin{tabular}{r c{10cm} }
+\toprule
+\textbf{Acronym} & \textbf{Full name}\\
+\midrule
+\textbf{ML} & Machine Learning\\
+\textbf{DL} & Deep Learning\\
+    \textbf{MLE} & Maximum Likelihood Estimation\\
+\textbf{RL} & Reinforcement Learning\\
+\textbf{DRL} & Deep Reinforcement Learning\\
+\textbf{MDP} & Markov Decision Process\\
+    \textbf{TD} & Temporal Difference\\
+\textbf{ICF} & Independently Controllable Factors\\
+
+\textbf{IS} & Importance Sampling\\
+\textbf{MPC} & Model Predictive Control\\
+    \textbf{CEM} & Cross Entropy Method\\
+\textbf{HMM} & Hidden Markov Model\\
+\textbf{MCTS} & Monte Carlo Tree Search\\
+\textbf{MCMC} & Markov Chain Monte Carlo\\
+    \textbf{SMC} & Sequential Monte Carlo\\
+    \textbf{RS} & Random Shooting\\
+    \textbf{SAC} & Soft Actor Critic\\
+    \textbf{SG} & Stochastic Gradient\\
+    \textbf{SGD} & Stochastic Gradient Descent\\
+\textbf{PG} & Policy Gradient\\
+\textbf{NPG} & Natural Policy Gradient\\
+\bottomrule
+\end{tabular}
+\end{center}
+\label{tab:acronyms}
 \end{table}
 
 
