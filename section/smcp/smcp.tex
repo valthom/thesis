@@ -317,19 +317,19 @@ The proposal is an isotropic normal distribution for each planning algorithm, an
 
 
 \begin{figure}
-\begin{subfigure}{.295\textwidth}
+    \begin{subfigure}[t]{.295\textwidth}
 \centering
 \includegraphics[width=\linewidth, trim={1.1cm 0cm .5cm 0cm},clip]{articles/smcp/figures/smc_resampling_true.png}
 \caption{Sequential Importance Resampling (SIR): when resampling the trajectories at each time step, the agent is able to focus on the promising trajectories and does not collapse on a single mode.}
 \label{fig:toy_sir}
 \end{subfigure}\hspace{0.05\linewidth}
-\begin{subfigure}{.295\textwidth}
+\begin{subfigure}[t]{.295\textwidth}
 \centering
 \includegraphics[width=\linewidth, trim={1.1cm 0cm .5cm 0cm},clip]{articles/smcp/figures/smc_resampling_false.png}
 \caption{Sequential Importance Sampling (SIS): if we do not perform the resampling step the agent spends most of its computation on uninteresting trajectories and was not able to explore as well.\vspace{1em}}
 \label{fig:toy_sis}
 \end{subfigure}\hspace{0.05\linewidth}
-\begin{subfigure}{.295\textwidth}
+\begin{subfigure}[t]{.295\textwidth}
 \centering
 \includegraphics[width=\linewidth, trim={1.1cm 0cm .5cm 0cm},clip]{articles/smcp/figures/cem.png}
 \caption{CEM: here the agent samples all the actions at once from a Gaussian with learned mean and covariance. We needed to update the parameters 50 times for the agent to find one solution, but it forgot the other one. }
