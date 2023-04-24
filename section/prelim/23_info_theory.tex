@@ -72,11 +72,11 @@ The notion of entropy is fundamental in physics where it was first introduced by
 
 \begin{equation}
 \label{eq:entropy}
-    H(X) = - \sum_{x \in \gX} p(x) \log p(x)
+    H(X) = - \sum_{x \in \gX} p(x) \log p(x).
 \end{equation}
 
-Entropy should be understood as the \emph{information} necessary to describe $p$. As such, the entropy is always positive $H(X) \ge 0$, it is equal to $0$ only when $p$ is a Dirac function, in that case $p$ does not contain any uncertainty.
-$H(X)$ is also bounded by number of values $X$ can take: $H(X) \le \log | \gX |$ which is achieved when $p$ is the uniform distribution, the distribution with maximal uncertainty. Note that entropy can be defined in the same way for continuous variables, we call this the \emph{differential entropy} $h(X) = - \int_{\gX} p(x) \log (x) dx$ but we lose the upper and lower bounds described above.
+Entropy should be understood as the \emph{information} necessary to describe $p$. As such, the entropy is always positive $H(X) \ge 0$: it is equal to $0$ only when $p$ is a Dirac function; in that case $p$ does not contain any uncertainty.
+$H(X)$ is also bounded by the number of values $X$ can take: $H(X) \le \log | \gX |$ which is achieved when $p$ is the uniform distribution, the distribution with maximal uncertainty. Note that entropy can be defined in the same way for continuous variables, we call this the \emph{differential entropy} $h(X) = - \int_{\gX} p(x) \log (x) dx$ but we lose the upper and lower bounds described above.
 
 Using the notion of Kullback-Leibler divergence notion defined above and by defining the uniform distribution whose probability mass function is $u(x) = \frac{1}{|\gX|}, \ \forall x \in \gX$, we have
 

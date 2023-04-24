@@ -1,7 +1,7 @@
 \chapter{Beyond Variance Reduction: Understanding the True Impact of Baselines on Policy Optimization}
 \label{chapter:baselines}
 \section*{Article details}
-Thomas V*, Chung W*, Machado M. C., Le Roux N. ``Beyond variance reduction: Understanding the true impact of baselines on policy optimization''. In \emph{International Conference on Machine Learning (ICML) 2021. PMLR}.
+Thomas Valentin*, Chung Wesley*, Machado Marlos C., Le Roux Nicolas ``Beyond variance reduction: Understanding the true impact of baselines on policy optimization''. In \emph{International Conference on Machine Learning (ICML) 2021. PMLR}.
 
 \section*{Foreword}
 In the summer of 2019, I interned at Google Brain Montr\'{e}al with Nicolas Le Roux and Marlos C. Machado and my project was initially about using off-policy learning to reduce the variance of the gradients for Policy Gradient methods in Reinforcement Learning. However, when comparing our method to other variance reduction methods, such as the use of baselines, I came to realise that \emph{symmetric} perturbations of the variance-minimizing baseline (e.g $\pm \epsilon$), while increasing the variance by the same amount, led to \emph{asymmetric} impacts on the regret/average reward. While we initially decided to continue exploring the first project, we came back to this observation which Wesley had begun to work on with Nicolas. By studying this on simple examples such as a two-arm bandits, Nicolas was first able to demonstrate our first divergence result. During the year 2020, we worked together on extending both the divergence and convergence results and deepened our understanding of the problem.

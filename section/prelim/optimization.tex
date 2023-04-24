@@ -9,13 +9,15 @@ Mathematically speaking, this is predominantly framed as a parametric optimizati
 
 $$\min_\theta \frac{1}{N} \sum_{i=1}^N \gL_\theta(x_i)$$
 
-where $\gL$ is our loss function and $\theta \in \mathbb{R}^d$ is the parameter vector we optimize over. With the advent of large neural networks, $\theta$ can be a very high dimensional vector, up to hundred of billions/ a few trillions of parameters as of late 2022~\citep{chowdhery2022palm, switch2022fedus}, in opposition with classical methods for which $\theta$ was often low dimensional (compared to the number of training examples).
+where $\gL$ is our loss function and $\theta \in \mathbb{R}^d$ is the parameter
+vector we optimize over. With the advent of large neural networks, $\theta$ can
+be a very high dimensional vector, up to hundreds of billions/ a few trillions of parameters as of late 2022~\citep{chowdhery2022palm, switch2022fedus}, in opposition with classical methods for which $\theta$ was often low dimensional (compared to the number of training examples).
 
-Commonly, our \emph{model} is a parametric function $q_\theta$ (for instance of neural network) whose goal is to approximate $p$. A natural objective to ensure $q_\theta$ becomes closer to $p$ is to maximize the likelihood of the training examples $x_i$ sampled from $p$ under $q_\theta$, i.e maximizing $q_\theta(\gD_\text{train}) = \Pi_{i=1}^N q_\theta(x_i)$ as per the i.i.d assumption. As the logarithm is a non-decreasing function and $N$ is constant, we can choose to maximize instead
-$$\max_\theta \frac{1}{N} \sum_{i=1}^N \log q_\theta(x_i)$$
+Commonly, our \emph{model} is a parametric function $q_\theta$ (for instance a neural network) whose goal is to approximate $p$. A natural objective to ensure $q_\theta$ becomes closer to $p$ is to maximize the likelihood of the training examples $x_i$ sampled from $p$ under $q_\theta$, i.e maximizing $q_\theta(\gD_\text{train}) = \Pi_{i=1}^N q_\theta(x_i)$ as per the i.i.d assumption. As the logarithm is a non-decreasing function and $N$ is constant, we can choose to maximize instead
+$$\max_\theta \frac{1}{N} \sum_{i=1}^N \log q_\theta(x_i).$$
 It appears clearly here that maximizing the likelihood of the data is equivalent to minimizing the negative log-likelihood $\gL_\theta(\cdot) = - \log q_\theta(\cdot)$ averaged over $\gD_\text{train}$.
 
-Note that this \textbf{maximum likelihood} (or minimum negative log-likelihood) objective can be realted  to a Kullback-Leibler divergence. By calling $\hat{p}(x) = \frac{1}{N} \sum_{i=1}^N \delta_{x_i}(x)$ the empirical distribution over the training samples, we have that
+Note that this \textbf{maximum likelihood} (or minimum negative log-likelihood) objective can be related to a Kullback-Leibler divergence. By calling $\hat{p}(x) = \frac{1}{N} \sum_{i=1}^N \delta_{x_i}(x)$ the empirical distribution over the training samples, we have that
 
 \begin{align*}
 \KL(\hat{p}||q_\theta) &= \frac{1}{N} \sum_{i=1}^N \log \hat{p}(x_i) - \log q_\theta(x_i) \\
@@ -32,7 +34,9 @@ $$\gG = \E_{x\sim p}[\gL_\theta(x)] -\E_{x\sim \hat{p}}[\gL_\theta(x)]$$
 The generalization gap and how to estimate it is at the core of Chapter~\ref{chapter:hfc}: in our article we show how one can build estimators of $\gG$ from the local curvature and variance of our model. 
 
 \subsection{Stochastic gradient descent}
-Now we turn back our attention to the original optimization problem $\min_\theta \frac{1}{N} \sum_{i=1}^N \gL_\theta(x_i)$. When using neural networks, we can estimate efficiently estimate $\nabla_\theta \gL_\theta$ the gradient of $\gL_\theta$ using the backpropagation algorithm~\citep{rumelhart1986learning}. Thus, we can use the \emph{gradient descent} algorithm to minimize our loss
+Now we turn back our attention to the original optimization problem $\min_\theta
+\frac{1}{N} \sum_{i=1}^N \gL_\theta(x_i)$. When using neural networks, we can
+efficiently estimate $\nabla_\theta \gL_\theta$, the gradient of $\gL_\theta$ using the backpropagation algorithm~\citep{rumelhart1986learning}. Thus, we can use the \emph{gradient descent} algorithm to minimize our loss
 
 \begin{equation}
 \label{eq:gradient_descent}
@@ -40,7 +44,9 @@ Now we turn back our attention to the original optimization problem $\min_\theta
 \end{equation}
 where $\eta$ is a positive scalar called the learning rate. Under some smoothness assumptions on $\gL$ and for a small enough $\eta$, we can show that this algorithm will converge to a local minimum of our objective function.
 
-This algorithm is however expensive when $N$ is very large as is common in modern machine learning. An alternative to regular gradient descent is to use \textbf{stochastic gradient descent}~\citep{robbins1951stochastic}  i.e we only use a sample, or more generally, a mini-batch of $B$ samples to compute a noisy estimate of the gradient. This trade-off between noise and complexity of computing a gradient estimate is well-understood and favorable in the regime where $N$ is large~\citep{tradeoffs2007bottou}.
+This algorithm is however expensive when $N$ is very large as is common in
+modern machine learning. An alternative to regular gradient descent is to use
+\textbf{stochastic gradient descent}~\citep{robbins1951stochastic}, i.e, we only use a sample, or more generally, a mini-batch of $B$ samples to compute a noisy estimate of the gradient. This trade-off between noise and complexity of computing a gradient estimate is well-understood and favorable in the regime where $N$ is large~\citep{tradeoffs2007bottou}.
 
 \begin{equation}
 \label{eq:stochastic_gradient_descent}

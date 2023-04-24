@@ -11,12 +11,13 @@ In this thesis, we are interested in learning and planning algorithms in the pre
 
 Our first contribution in "learning disentangled independently controllable factors of variation"~\citep{bengio2017independently, thomas2017independently, thomas2018disentangling} addresses the issue of how an agent, without any specified goal, can comprehend its environment by interacting with it, discovering controllable elements, and constructing useful internal representations of these aspects of the world. We propose and investigate a direct mechanism, inspired from how children learn, that explicitly connects an agent's control over its environment to its internal feature representations. We then show how these jointly learned policies and \emph{independently controllable factors} lead to learning a disentangled latent representation that can be used for planning. 
 
-
-
 However, even when the agent is able to build an appropriate representation or model of the world, how to use it to decide which action to take is another challenge.
-We tackle this one with our second work ``Probabilistic planning with sequential Monte Carlo Methods'' by designing a novel planning algorithm. By interpreting the set of solutions to a task as a distribution as in \textit{control as inference}~\citep{toussaint2006probabilistic, toussaint2009robot, levine2018reinforcement}, we show how we can use a particle filter method to estimate this distribution. This yield an new, intuitive and theoretically grounded algorithm for planning in stochastic continuous domains.
+We tackle this one with our second work ``Probabilistic planning with sequential Monte Carlo Methods'' by designing a novel planning algorithm. By interpreting the set of solutions to a task as a distribution as in \textit{control as inference}~\citep{toussaint2006probabilistic, toussaint2009robot, levine2018reinforcement}, we show how we can use a particle filter method to estimate this distribution. This yield a new, intuitive and theoretically grounded algorithm for planning in stochastic continuous domains.
 
-Our next two contributions are concerned with the process of learning itself and how it can be affected by noise. The third paper we present examines the role that gradient noise and local curvature can have on the optimization speed and the generalization of a model. We show how a simple metric can measure capacity of a model more effectively that the raw number of parameters.
+Our next two contributions are concerned with the process of learning itself and
+how it can be affected by noise. The third paper we present examines the role
+that gradient noise and local curvature can have on the optimization speed and
+the generalization of a model. We show how a simple metric can measure the capacity of a model more effectively that the raw number of parameters.
 In our fourth and last contribution, we investigate the role of gradient noise for policy gradient methods in bandits and RL. More specifically we take a closer look at \emph{baselines}, an ubiquitous algorithmic choice in policy gradient methods motivated by variance reduction purposes. In accordance with classical optimization theorems, the prevailing view among researchers is that gradient noise leads to slower convergence in RL as well. However, in this paper, we show that this view is flawed and that there is an important interplay between the gradient noise and the propensity of the agent to try new actions, which can ultimately lead to discovering better policies.
 
 

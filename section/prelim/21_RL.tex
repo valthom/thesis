@@ -8,7 +8,13 @@
 }
 \subsection{General setting and Markov Decision Processes}
 
-Reinforcement learning (RL) is a sequential decision making problem where an agent can take \textit{decisions} or \textit{actions} in a world, called \textit{environment}, in order to maximize some signal called the \textit{reward}. This is formalized as a Markov Decision Process (MDP) as described in~\citet{bellman1954theory} and~\citet{puterman2014markov}. An MDP is a tuple $\langle \gS, \gA, \penv, r, \mu\rangle$ where $\gS$ is the set of states, $\gA$ is set of possible actions that the agent can take, $r: \gS \times \gA \mapsto \mathbb{R}$ is the reward function, a function that maps a state and action to a scalar and $\penv(s' | s, a), \quad s', s \in \gS \times \gS, a \in \gA$ is the transition function, a probability distribution over states given the current state and action. The assumption that the next state only depends only on the current state and the action taken by the agent, and not on previous states or actions is referred to as \emph{the Markov assumption}.
+Reinforcement learning (RL) is a sequential decision making problem where an
+agent can take \textit{decisions} or \textit{actions} in a world, called
+\textit{environment}, in order to maximize some signal called the
+\textit{reward}. This is formalized as a Markov Decision Process (MDP) as
+described in~\citet{bellman1954theory} and~\citet{puterman2014markov}. An MDP is
+a tuple $\langle \gS, \gA, \penv, r, \mu\rangle$ where $\gS$ is the set of
+states, $\gA$ is the set of possible actions that the agent can take, $r: \gS \times \gA \mapsto \mathbb{R}$ is the reward function, a function that maps a state and action to a scalar and $\penv(s' | s, a), \quad s', s \in \gS \times \gS, a \in \gA$ is the transition function, a probability distribution over states given the current state and action. The assumption that the next state only depends only on the current state and the action taken by the agent, and not on previous states or actions is referred to as \emph{the Markov assumption}.
 
 The goal of the agent is to learn a probability distribution over actions called a policy $\pi(a_t|s_t)$ that maximizes the discounted sum of the reward
 $$\gJ(\pi) = \E_{a_t \sim \pi(\cdot|s_t), s_{t+1} \sim \penv(\cdot | s_t, a_t)}[\sum_t \gamma^t \reward(s_t, a_t)]$$
@@ -115,7 +121,9 @@ More generally, by unrolling the equation for $n$ steps instead of just one, we 
 \begin{equation}
       V^\pi(s)  = \E [\sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n V^\pi(s_{t+n})]
 \end{equation}
-And we will refer to $R^{n}_t \triangleq \sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n V^\pi(s_{t+n})$ as the \emph{$n$-step return}, which is a random variable conditioned on state $s_t$. The $0$-step return is simply the value function of $s_t$ while the $\infty$-step return (i.e where we unroll until the episode stops) is the empirical discounted return $R_t$. This circles back to the definition of $V^\pi(s_t)$ as being the expected empirical return from $s_t$. As all the $n$-step returns are unbiased estimates of the value function, it is also possible to mix them in order to obtain new estimators such as the $\lambda$-return which weights the $n$-step returns according to a geometric distribution of parameter $\lambda$
+And we will refer to $R^{n}_t \triangleq \sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n
+V^\pi(s_{t+n})$ as the \emph{$n$-step return}, which is a random variable
+conditioned on state $s_t$. The expected $0$-step return is simply the value function of $s_t$ while the $\infty$-step return (i.e where we unroll until the episode stops) is the empirical discounted return $R_t$. This circles back to the definition of $V^\pi(s_t)$ as being the expected empirical return from $s_t$. As all the $n$-step returns are unbiased estimates of the value function, it is also possible to mix them in order to obtain new estimators such as the $\lambda$-return which weights the $n$-step returns according to a geometric distribution of parameter $\lambda$
 
 \begin{equation}
 \label{eq:lambda_return}
@@ -236,7 +244,10 @@ We can write a more general, non-local, version of the policy gradient theorem t
 \begin{equation}
     \gJ(\pi') - \gJ(\pi) = \E_{s \sim d^{\pi'}_\gamma} \big[ \sum_a \big(\pi'(a|s)-\pi(a|s)\big) Q^\pi(s,a)\big]
 \end{equation}
-This equation is a generalization of the policy gradient theorem as taking the limit $\lim_{t\to 0} \frac{\gJ(\theta+t \delta \theta)-\gJ(\theta)}{t}$ would lead back to the policy gradient. Alternatively, as $d^{\pi'}_\gamma$ is always positive, we could look for the policy $\pi'$ that maximizes $ \sum_a \big(\pi'(a|s)-\pi(a|s)\big) Q^\pi(s,a)$, which is achieved for the greedy policy of \Cref{eq:greedification}. Thus with one unified objective we can understand how the two main methods for policy improvement are related. While policy gradient chooses infinitesimal step to increase the return, greedification performs more drastic updates by directly transitioning to the greedy policy.
+This equation is a generalization of the policy gradient theorem as taking the
+limit $\lim_{t\to 0} \frac{\gJ(\theta+t \delta \theta)-\gJ(\theta)}{t}$ would
+lead back to the policy gradient. Alternatively, as the discounted stationary
+distribution $d^{\pi'}_\gamma$ is always positive, we could look for the policy $\pi'$ that maximizes $ \sum_a \big(\pi'(a|s)-\pi(a|s)\big) Q^\pi(s,a)$, which is achieved for the greedy policy of \Cref{eq:greedification}. Thus with one unified objective we can understand how the two main methods for policy improvement are related. While policy gradient chooses infinitesimal step to increase the return, greedification performs more drastic updates by directly transitioning to the greedy policy.
 
 \subsubsection{Exploration}
 \label{subsubsec:exploration}
