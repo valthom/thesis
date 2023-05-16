@@ -198,29 +198,53 @@ Because of the apparent link with the notion of \textit{control variates} in sta
 
 We now illustrate here how a simple actor-critic algorithm using a 1-step return advantage could be implemented
 
-\begin{center}
-\begin{minipage}{0.9\textwidth}
-\begin{algorithm}[H]
-\caption{Simple actor critic algorithm with 1-step return}
-\label{alg:ac_methods}
+\begin{algorithm}
 \begin{algorithmic}[1]
-\STATE Choose initial $\theta_0, \phi_0$.
-\STATE Sample first state $s_0 \sim \mu$
-\FOR{$t$ in $\{0,\ldots, T\}$ }
-\STATE \textit{// Interact with the environment}
-\STATE $a_t \sim \pi_{\theta_t}(\cdot | s_t)$
-\STATE $s_{t+1}, r_t \sim \penv(\cdot, \cdot | s_t, a_t)$
-% \IF{$s_{t+1}$ is final}
-\STATE \textit{// Policy evaluation}
-\STATE $\phi_{t+1} = \phi_t - \eta_\phi \cdot \big(r_t + \gamma V_{\phi_t}(s_{t+1}) - V_{\phi_t}(s)\big) \nabla_{\phi_t}V_{\phi_t}(s) $
-\STATE \textit{// Policy improvement}
-\STATE $\theta_{t+1} = \theta_t + \eta_\theta \cdot \big( r_t + \gamma V_{\phi_t}(s_{t+1}) - V_{\phi_t}(s)\big) \nabla_{\theta_t} \log \pi_{\theta_t}(a|s)$ 
+\STATE Choose initial $\theta, \phi$.
+\FOR{episode = 1 to $M$}
+    \STATE Initialize state $s_0 \sim \mu$
+    \FOR{t = 0 to $T$}
+        \STATE \textit{// Interact with the environment}
+        \STATE $a_t \sim \pi_{\theta_t}(\cdot | s_t)$
+        \STATE $s_{t+1}, r_t \sim \penv(\cdot, \cdot | s_t, a_t)$
+        \STATE $\Psi_t = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)$
+        \STATE \textbf{If} $s_{t+1}$ is terminal \textbf{then }$\Psi_t = r_t - V_\phi(s_t)$ 
+        \STATE \textit{// Policy evaluation}
+        \STATE $\phi \leftarrow \phi - \eta_{\phi} \cdot \Psi_t \nabla_{\phi}V_{\phi}(s) $
+        \STATE \textit{// Policy improvement}
+        \STATE $\theta \leftarrow \theta + \eta_{\theta} \cdot \Psi_t \nabla_{\theta} \log \pi_{\theta}(a|s)$ 
+        \STATE{\textit{// Update state}} 
+        \STATE \textbf{If} $s_{t+1}$ is terminal \textbf{then break}
+    \ENDFOR
 \ENDFOR
 \end{algorithmic}
+\caption{Simple actor critic algorithm with 1-step return}
+\label{alg:ac_methods}
 \end{algorithm}
-\end{minipage}
-\end{center}
-\vspace{1em}
+
+% \begin{center}
+% \begin{minipage}{0.9\textwidth}
+% \begin{algorithm}[H]
+% \caption{Simple actor critic algorithm with 1-step return}
+% \label{alg:ac_methods}
+% \begin{algorithmic}[1]
+% \STATE Choose initial $\theta_0, \phi_0$.
+% \STATE Sample first state $s_0 \sim \mu$
+% \FOR{$t$ in $\{0,\ldots, T\}$ }
+% \STATE \textit{// Interact with the environment}
+% \STATE $a_t \sim \pi_{\theta_t}(\cdot | s_t)$
+% \STATE $s_{t+1}, r_t \sim \penv(\cdot, \cdot | s_t, a_t)$
+% % \IF{$s_{t+1}$ is final}
+% \STATE \textit{// Policy evaluation}
+% \STATE $\phi_{t+1} = \phi_t - \eta_\phi \cdot \big(r_t + \gamma V_{\phi_t}(s_{t+1}) - V_{\phi_t}(s)\big) \nabla_{\phi_t}V_{\phi_t}(s) $
+% \STATE \textit{// Policy improvement}
+% \STATE $\theta_{t+1} = \theta_t + \eta_\theta \cdot \big( r_t + \gamma V_{\phi_t}(s_{t+1}) - V_{\phi_t}(s)\big) \nabla_{\theta_t} \log \pi_{\theta_t}(a|s)$ 
+% \ENDFOR
+% \end{algorithmic}
+% \end{algorithm}
+% \end{minipage}
+% \end{center}
+% \vspace{1em}
 
 
 \subsubsection{Policy greedification and value-based methods}
@@ -236,31 +260,58 @@ Thus the greedy policy is a deterministic policy which places all of its probabi
 SARSA and Q-Learning~\citep{watkins1992q} are examples of well-known \emph{value-based} algorithms: both learn an approximate value function using Temporal Difference learning and then perform a greedification step using the current $Q$ function estimate. While SARSA performs the TD step on the current policy $\pi$ (i.e its 1-step return target would be $r(s_t, a_t) + \gamma Q_\phi(s_{t+1}, a_{t+1})$ where $a_{t+1} \sim \pi(\cdot|s_{t+1})$), on the other hand Q-Learning uses a target with a look-ahead step as the next action is sampled from $\pi'$, thus the target is  $r(s_{t}, a_t) + \gamma Q_\phi(s_{t+1}, a'), \ a' \sim \pi'(\cdot|s_{t+1})$ or equivalently $r(s_t, a_t) + \gamma \max_a Q_\phi(s_{t+1}, a)$ as $\pi'$ is the greedy policy.
 
 
+\begin{algorithm}
+\begin{algorithmic}[1]
+\STATE \textit{// Initialize Q network}
+\STATE Choose initial $\phi$.
+\FOR{episode = 1 to $M$}
+    \STATE Initialize state $s_0 \sim \mu$
+    \FOR{t = 0 to $T$}
+        \STATE \textit{// Sample and execute action}
+        %\STATE $a_t \sim \pi_{\epsilon-\text{greedy}}( Q_{\phi}(s_t, \cdot))$
+        \STATE With probability $\epsilon$ select a random action $a$, otherwise $a \leftarrow \text{argmax}_a Q_\phi(s_t, a)$
+        \STATE $s_{t+1}, r_t \sim \penv(\cdot | s_t, a_t)$
 
-\begin{center}
-\begin{minipage}{0.9\textwidth}
-\begin{algorithm}[H]
+        \STATE $\delta_t = r_t + \gamma \max_{a'} Q_{\phi}(s_{t+1}, a') -
+        Q_{\phi}(s_t, a_t)$
+        \STATE \textbf{If} $s_{t+1}$ is terminal \textbf{then }$\delta_t = r_t - Q_{\phi}(s_t, a_t)$
+        \STATE \textit{// Temporal Difference update on the greedy policy}
+        \STATE $\phi \leftarrow {\phi} + \eta_\phi \cdot \delta_t \nabla_{\phi} Q_{\phi}(s_t, a_t) $
+        \STATE \textbf{If} $s_{t+1}$ is terminal \textbf{then break}
+    \ENDFOR
+\ENDFOR
+\end{algorithmic}
 \caption{Q-learning}
 \label{alg:q_learning}
-\begin{algorithmic}[1]
-\STATE \textit{// Initialize starting state and Q network}
-\STATE $s_0 \sim \mu(\cdot)$
-\STATE Initialize $\phi_0$
-\FOR{$t$ in $\{0,\ldots,\infty\}$}
-\STATE \textit{// Sample and execute action}
-\STATE $a_t \sim \pi_{\epsilon-\text{greedy}}( Q_{\phi_t}(s_t, \cdot))$
-\STATE $s_{t+1}, r_t \sim \penv(\cdot | s_t, a_t)$
-\STATE \textit{// Temporal Difference update on the greedy policy}
-\STATE $\phi_{t+1} \leftarrow {\phi_t} + \alpha \big( r_t + \gamma \max_{a'} Q_{\phi_t}(s_{t+1}, a') - Q_{\phi_t}(s_t, a_t) \big) \nabla_{\phi_t} Q_{\phi_t}(s_t, a_t) $
-\ENDFOR
-
-\end{algorithmic}
 \end{algorithm}
-\end{minipage}
-\end{center}
-Note here that in the algorithm we sampled actions from $\pi_{\epsilon-\text{greedy}}$. While we could sample greedily from $Q$ by taking its argmax, it is common practice to use a more random $\epsilon$-greedy policy that has a $\epsilon$ probability of sampling other actions as well. This enables us to \emph{explore} actions and states we might not have encountered otherwise. We will discuss briefly the exploration problem in~\Cref{subsubsec:exploration}.
 
-This algorithm has been very successful, and Deep Q-Learning~\citep{mnih2013playing}, a slightly modified version of this algorithm for deep reinforcement learning was the first algorithm to reach human level performance on the ALE benchmark~\citep{bellemare2013arcade}.
+% \begin{center}
+% \begin{minipage}{0.9\textwidth}
+% \begin{algorithm}[H]
+% \caption{Q-learning}
+% \label{alg:q_learning}
+% \begin{algorithmic}[1]
+% \STATE \textit{// Initialize starting state and Q network}
+% \STATE $s_0 \sim \mu(\cdot)$
+% \STATE Initialize $\phi_0$
+% \FOR{$t$ in $\{0,\ldots,\infty\}$}
+% \STATE \textit{// Sample and execute action}
+% \STATE $a_t \sim \pi_{\epsilon-\text{greedy}}( Q_{\phi_t}(s_t, \cdot))$
+% \STATE $s_{t+1}, r_t \sim \penv(\cdot | s_t, a_t)$
+% \STATE \textit{// Temporal Difference update on the greedy policy}
+% \STATE $\phi_{t+1} \leftarrow {\phi_t} + \alpha \big( r_t + \gamma \max_{a'} Q_{\phi_t}(s_{t+1}, a') - Q_{\phi_t}(s_t, a_t) \big) \nabla_{\phi_t} Q_{\phi_t}(s_t, a_t) $
+% \ENDFOR
+%
+% \end{algorithmic}
+% \end{algorithm}
+% \end{minipage}
+% \end{center}
+Note here that in the algorithm we sampled actions from an
+${\epsilon-\text{greedy}}$ policy. While we could sample greedily from $Q$ by taking its argmax, it is common practice to use a more random $\epsilon$-greedy policy that has a $\epsilon$ probability of sampling other actions as well. This enables us to \emph{explore} actions and states we might not have encountered otherwise. We will discuss briefly the exploration problem in~\Cref{subsubsec:exploration}.
+
+This algorithm has been very successful, and Deep
+Q-Learning~\citep{mnih2013playing}, a slightly modified version of this
+algorithm for deep reinforcement learning, was the first algorithm to reach human level performance on the ALE benchmark~\citep{bellemare2013arcade}.
 
 
 \subsubsection{General conditions for improvement} 
