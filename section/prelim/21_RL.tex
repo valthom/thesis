@@ -40,6 +40,7 @@ In practice, the agent will interact with the environment in the following manne
 \STATE \textit{// Update trajectory and return}
 \STATE $\tau_{0:t} \leftarrow \tau_{0:t-1} \cup \{s_t, a_t\}$
 \STATE $R_t \leftarrow R_{t-1} + \gamma^t r_t$
+\STATE If $s_{t+1}$ is terminal, \textbf{break}
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
