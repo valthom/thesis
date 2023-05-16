@@ -18,7 +18,9 @@ states, $\gA$ is the set of possible actions that the agent can take, $r: \gS \t
 
 The goal of the agent is to learn a probability distribution over actions called a policy $\pi(a_t|s_t)$ that maximizes the discounted sum of the reward
 $$\gJ(\pi) = \E_{a_t \sim \pi(\cdot|s_t), s_{t+1} \sim \penv(\cdot | s_t, a_t)}[\sum_t \gamma^t \reward(s_t, a_t)]$$
-where $\gamma \in [0, 1 [$, the \emph{discount factor} is here to ensure the objective remains bounded. Typically the policy $\pi$ is parametrized by a neural network with weights $\theta$, we will refer to this parametrized policy network as $\pi_\theta$ and the objective will be denoted either $\gJ(\pi_\theta)$ or $\gJ(\theta)$.
+where $\gamma$ is called the \emph{discount factor}.
+In the episodic case, where sequences of states and actions ultimately reach an ending state, $\gamma$ has to be positive and smaller or equal to $1$. In the continuing setting, where an agent interacts with the world indefinitely, we need $\gamma \in [0, 1 [$ to ensure the objective remains bounded. 
+In Deep Reinforcement Learning, the policy $\pi$ is usually obtained using a neural network. In policy gradient methods (\Cref{subsec:pg_ac}) the policy is directly parametrized by a neural network with weights $\theta$ so we will refer to this parametrized policy network as $\pi_\theta$ and the objective will be denoted either $\gJ(\pi_\theta)$ or $\gJ(\theta)$.% For value based methods such as Q-learning (\Cref{subsec:qlearning}) the policy is obtained indirectly through a neural network which approc
 
 In practice, the agent will interact with the environment in the following manner
 
@@ -77,7 +79,7 @@ Alongside with the policy $\pi$, one of the most important concept in reinforcem
 Intuitively, it is a measure of how ``good'' a current situation is for the agent, or more precisely ``how much discounted return'' we can expect to gather from a given situation.
 
 \subsubsection{Value and Q functions}
-We first define the value and Q functions. Both are expectations of the future discounted return, but while for the value it is conditional on a state $s$, for the Q function we condition on both a state and an action $s, a$.
+We first define the value and Q functions. Both are expectations of the future discounted return, but while the value is conditional on a state $s$, for the Q function we condition on both a state and an action $s, a$.
 
 Thus, for the value function $V^\pi$
 \begin{equation}
@@ -93,13 +95,13 @@ The Q function is the expected discounted return under the current policy condit
 These two functions can be easily related to our original objective
 $$\gJ(\pi) = \E_{s_0 \sim \mu} [ V^\pi(s_0)] = \E_{s_0 \sim \mu, a_0 \sim \pi(\cdot | s_0)} [ Q^\pi(s_0, a_0)]$$
 
-Thus the value function averaged over the initial state is the objective function we aimed at evaluating.
+Thus the value function averaged over the initial state is the objective function we aim at evaluating.
 
 
 
 \subsubsection{Bellman equations for $V^\pi$ and $Q^\pi$}
 \label{subsec:bellman_eq}
-Because of the Markov assumption implicitly, i.e that the distribution of $s_{t+1}$ and $r_t$ only depends on $s_t$ and $a_t$, the value of a state can be expressed in function of the value of its successor states. Indeed, the value and Q functions verify a recursion known as the Bellman equation
+Because of the Markov assumption, i.e that the distribution of $s_{t+1}$ and $r_t$ only depends on $s_t$ and $a_t$, the value of a state can be expressed in function of the value of its successor states. Indeed, the value and Q functions verify a recursion known as the Bellman equation
 
 \begin{eqnarray}
     V^\pi(s_t) &=& \E_{a_t, s_{t+1} \dots} \big[ \sum_{t' \ge t} \gamma^{t'-t} r_{t'} | s_t \big] \nonumber\\
@@ -136,7 +138,7 @@ For $\lambda=0$, we get back the $1$-step return $r_t + \gamma V^\pi(s_t)$ while
 \subsubsection{Learning parametric value functions}
 \label{subsec:td}
 
-Now we will see how to use the properties of the true value function $V^\pi$ to build a parametric estimator of it. While there exit non-parametric methods, often referred to as \emph{memory-based} methods~\citep{atkeson1997locally}, nowadays in most settings the value function is parametrized via a neural network. Let us call $\phi$ the parameters of the value (respectively Q) function approximator $V_\phi$ (resp $Q_\phi$).
+Now we will see how to use the properties of the true value function $V^\pi$ to build a parametric estimator of it. While there are non-parametric methods, often referred to as \emph{memory-based} methods~\citep{atkeson1997locally}, nowadays in most settings the value function is parametrized via a neural network. Let us call $\phi$ the parameters of the value (respectively Q) function approximator $V_\phi$ (resp $Q_\phi$).
 
 As the value function satisfies the Bellman equation~\cref{eq:expected_bellman}, we can learn a function that satisfies the same equation
 
@@ -161,19 +163,39 @@ Furthermore we can extend TD(0) to TD($\lambda$) by using a $\lambda$-return for
 Ultimately, as mentioned previously, our goal is to improve $\gJ$, given our current policy $\pi$ we aim at finding a new one $\pi'$ yielding a higher expected return, i.e $\gJ(\pi') \ge \gJ(\pi)$. In the next subsections, we will present \emph{Policy gradient} and \emph{policy greedification}, the two main families of policy improvement methods used in modern reinforcement learning.
 
 \subsubsection{Policy gradient and actor critic methods}
+\label{subsec:pg_ac}
 To learn a new policy via gradient ascent, we need to differentiate through the objective $\gJ(\pi_\theta)$ with respect to the policy parameter $\theta$.
 We have~\citep{williams1992simple, sutton1999policy}
 \begin{equation}
     \label{eq:policy_gradient}
-    \nabla_\theta \gJ(\theta) = \E_{s, a \sim d^\pi_\gamma(s,a)} [ Q^\pi(s,a) \nabla_\theta \log \pi_\theta(a|s)]
+    \nabla_\theta \gJ(\theta) = \E_{s, a \sim d^\pi_\gamma(s,a)} [ Q^{\pi_\theta}(s,a) \nabla_\theta \log \pi_\theta(a|s)]
 \end{equation}
 Note that this requires knowledge of the true $Q$-function and an expectation over all states to be exact. In practice, we use an estimator for $Q^\pi(s,a)$ and perform a \emph{stochastic gradient} update by sampling $s,a \sim d^\pi$ by rolling out trajectories in the environment\footnote{Note here that sampling from $d^\pi$ instead of $d^\pi_\gamma$, while theoretically incorrect is widely used in practice. See~\citep{nota2019policy} for a more in-depth discussion.}.
 
-When we use the Monte Carlo estimate $R(s, a)$ instead of $Q^\pi(s,a)$, we usually refer to this method simply as ``vanilla policy gradient'' as we don't necessarily need to learn a parametric value function to improve our policy. 
+When we use the Monte Carlo estimate $R(s, a)$ instead of $Q^{\pi_\theta}(s,a)$, we usually refer to this method simply as ``vanilla policy gradient'' as we don't necessarily need to learn a parametric value function to improve our policy. 
 
-Alternatively we can use a bootstrapped estimator of the value function as presented in \Cref{subsec:bellman_eq} such as $r(s,a) + \gamma V_\phi(s')$ or a $\lambda$-return instead of $Q^\pi$. Furthermore, for reasons motivated by variance reduction, it is common to subtract the value function at the current state $V_\phi(s)$ from the $Q$-function estimator. This gives us a stochastic gradient estimate $A_{\phi}(s,a) \nabla_\theta \log \pi_\theta(a|s)$ where $A_\phi(s,a)$ is called the \emph{advantage function}. $A_\phi(s,a)$ is typically the difference between 1) a quantity whose expectation is the Q function and 2) the value function. The role of subtracting the value function in the advantage will be the subject of our contribution in~\Cref{chapter:baselines}. $A_\phi$ is also referred to as a \emph{critic} as it will be positive when choosing $a$ results in a higher value than the expectation of all actions according to the policy. On the other hand, the policy network $\pi_\theta$ chooses which action to perform and as such is called the \emph{actor}. Thus this class of algorithms where we learn on set of parameters $\theta$ to act and another set of parameters $\phi$ to judge the value of the action is called \textbf{actor-critic algorithms.} 
+This stochastic gradient can be broken into two parts: the actor and the critic $$\underbrace{\Psi(s,a)}_{\text{``critic''}} \nabla_\theta \log \underbrace{\pi_\theta(a|s)}_{\text{``actor''}}, \quad s,a \sim d^\pi$$
+While the ``actor'' is simply our policy which samples actions, the ``critic'' part is a scalar quantity that appears in front the gradient of the log probabilities $\nabla_\theta \log \pi_\theta(a|s)$ and evaluates the desirability of action $a$ in state $s$. As we saw previously, the true Q-function $ Q^{\pi_\theta}(s,a)$ leads to a valid gradient estimator, but there is a variety of choices used in practice for the critic. As we may not have access to the true Q-function, one can use an approximation of it, $Q_\phi$, learned with TD methods for instance.
+Alternatively we might employ a bootstrapped estimator of the value function as presented in \Cref{subsec:bellman_eq} such as $r(s,a) + \gamma V_\phi(s')$ or a $\lambda$-return instead of $Q_\phi$. 
+This class of algorithms where we learn one set of parameters for the policy to take actions and another set of parameters for the critic to judge the value of the action is called \textbf{actor-critic algorithms.} 
 
-For instance here is a simple actor-critic algorithm using a 1-step return advantage
+The most popular choices for critics are called \textbf{advantage functions}. These critics are \emph{centered} estimates of the Q function. As $\E_{a\sim\pi(\cdot|s)} [Q^\pi(s,a)] = V^\pi(s)$ advantage functions can be of the form $A_\phi(s,a) = Q_\phi(s,a) - V_\phi(s)$, $A_\phi(s,a) =  r(s,a) + \gamma V_\phi(s') - V_\phi(s)$ or generally using a $n$-step or $\lambda$-return in lieu of the Q function estimator. 
+
+Historically, advantage functions have been motivated by variance reduction arguments. Indeed, for any function dependent on state only $b(s)$ (such as the value function), which we will refer to as a \textit{baseline}, we have
+\begin{eqnarray*}
+    \E_{s, a \sim d^\pi_\gamma(s,a)} [ b(s) \nabla_\theta \log \pi_\theta(a|s)] &=& \E_{s \sim d^\pi_\gamma(s)} \big[ b(s)   \E_{a \sim \pi_\theta(a|s)} [ \nabla_\theta \log \pi_\theta(a|s)] \big]\\
+    &=&  \E_{s \sim d^\pi_\gamma(s)} \big[ b(s)  \E_{a \sim \pi_\theta(a|s)} [  \frac{\nabla_\theta \pi_\theta(a|s)} {\pi_\theta(a|s)}]\big] \\
+    &=&  \E_{s \sim d^\pi_\gamma(s)} \big[ b(s)  \sum_a \nabla_\theta \pi_\theta(a|s)\big] \\
+     &=&  \E_{s \sim d^\pi_\gamma(s)} \big[ b(s) \nabla_\theta  \underbrace{\sum_a \pi_\theta(a|s)}_{=1}\big]\\
+     &=& 0 \quad \textit{(gradient of a constant is zero)}\\
+\end{eqnarray*}
+Thus, adding or removing any state-dependent baseline $b(s)$ (such as the value function) to the Q function does not bias the policy gradient. Conceptually, as the baseline does not depend on the action $a$, it does not affect the relative preference of one action over another under policy $\pi_\theta(a|s)$. %The baseline serves as a reference point for the value of state $s$, and subtracting it from the Q function essentially centers the value estimates around this baseline.
+Because of the apparent link with the notion of \textit{control variates} in statistics —these are functions with zero mean that, when chosen carefully, can reduce variance— the role of the baseline $b(s)$ is often motivated by variance reduction arguments. However, in~\Cref{chapter:baselines} we will take a closer look at the role of baselines in policy gradient methods and show that they have an important impact on the optimization process, beyond their variance reduction property.
+
+% Furthermore, for reasons motivated by variance reduction, it is common to subtract the value function at the current state $V_\phi(s)$ from the $Q$-function estimator. This gives us a stochastic gradient estimate $A_{\phi}(s,a) \nabla_\theta \log \pi_\theta(a|s)$ where $A_\phi(s,a)$ is called the \emph{advantage function}. $A_\phi(s,a)$ is typically the difference between 1) a quantity whose expectation is the Q function and 2) the value function. The role of subtracting the value function in the advantage will be the subject of our contribution in~\Cref{chapter:baselines}. $A_\phi$ is also referred to as a \emph{critic} as it will be positive when choosing $a$ results in a higher value than the expectation of all actions according to the policy. On the other hand, the policy network $\pi_\theta$ chooses which action to perform and as such is called the \emph{actor}. 
+
+
+We now illustrate here how a simple actor-critic algorithm using a 1-step return advantage could be implemented
 
 \begin{center}
 \begin{minipage}{0.9\textwidth}
@@ -187,6 +209,7 @@ For instance here is a simple actor-critic algorithm using a 1-step return advan
 \STATE \textit{// Interact with the environment}
 \STATE $a_t \sim \pi_{\theta_t}(\cdot | s_t)$
 \STATE $s_{t+1}, r_t \sim \penv(\cdot, \cdot | s_t, a_t)$
+% \IF{$s_{t+1}$ is final}
 \STATE \textit{// Policy evaluation}
 \STATE $\phi_{t+1} = \phi_t - \eta_\phi \cdot \big(r_t + \gamma V_{\phi_t}(s_{t+1}) - V_{\phi_t}(s)\big) \nabla_{\phi_t}V_{\phi_t}(s) $
 \STATE \textit{// Policy improvement}
@@ -198,7 +221,9 @@ For instance here is a simple actor-critic algorithm using a 1-step return advan
 \end{center}
 \vspace{1em}
 
+
 \subsubsection{Policy greedification and value-based methods}
+\label{subsec:qlearning}
 Greedification is a totally different method that allows us to derive policies directly from $Q$-functions and as such we do not need to parameterize $\pi$ by $\theta$.
 We define the \emph{greedy} policy $\pi'$ with respect to $Q^\pi$ as
 \begin{equation}

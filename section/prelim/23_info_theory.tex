@@ -20,7 +20,8 @@ Let us consider a random variable $X \in \gX$ and a function $p: \gX \mapsto \R$
 \begin{enumerate}
     \item $p(x) \ge 0, \forall x \in \gX$
     \item $\int_\gX p(x) dx = 1$
-    \item $\mathbb{P}(a \le X \le b) = \int_a^b p(x) dx$
+    % \item $\mathbb{P}(a \le X \le b) = \int_a^b p(x) dx$
+    \item $\mathbb{P}(X \in A) = \int_{x\in A} p(x) dx$
 \end{enumerate}
 \end{definition}
 
@@ -29,7 +30,7 @@ We will make use of this concept extensively as most machine learning methods ca
 
 
 \subsection{Divergences}
-While distances are the typical notion used for comparing mathematical objects, a weaker notion, called divergences are often used to compare probability measures.
+While distances are the typical notion used for comparing mathematical objects, a weaker notion called ``divergences'' are often used to compare probability measures.
 
 
 
