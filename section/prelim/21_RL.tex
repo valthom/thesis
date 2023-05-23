@@ -207,12 +207,12 @@ We now illustrate here how a simple actor-critic algorithm using a 1-step return
         \STATE \textit{// Interact with the environment}
         \STATE $a_t \sim \pi_{\theta_t}(\cdot | s_t)$
         \STATE $s_{t+1}, r_t \sim \penv(\cdot, \cdot | s_t, a_t)$
-        \STATE $\Psi_t = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)$
-        \STATE \textbf{If} $s_{t+1}$ is terminal \textbf{then }$\Psi_t = r_t - V_\phi(s_t)$ 
+        \STATE $A_t = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)$
+        \STATE \textbf{If} $s_{t+1}$ is terminal \textbf{then }$A_t = r_t - V_\phi(s_t)$ 
         \STATE \textit{// Policy evaluation}
-        \STATE $\phi \leftarrow \phi - \eta_{\phi} \cdot \Psi_t \nabla_{\phi}V_{\phi}(s) $
+        \STATE $\phi \leftarrow \phi + \eta_{\phi} \cdot A_t \nabla_{\phi}V_{\phi}(s) $
         \STATE \textit{// Policy improvement}
-        \STATE $\theta \leftarrow \theta + \eta_{\theta} \cdot \Psi_t \nabla_{\theta} \log \pi_{\theta}(a|s)$ 
+        \STATE $\theta \leftarrow \theta + \eta_{\theta} \cdot A_t \nabla_{\theta} \log \pi_{\theta}(a|s)$ 
         \STATE{\textit{// Update state}} 
         \STATE \textbf{If} $s_{t+1}$ is terminal \textbf{then break}
     \ENDFOR
