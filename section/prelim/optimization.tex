@@ -50,7 +50,6 @@ modern machine learning. An alternative to regular gradient descent is to use
 
 \begin{equation}
 \label{eq:stochastic_gradient_descent}
-    \theta_{t+1} = \theta_t - \eta \frac{1}{B} \sum_{i=1}^B \nabla_\theta \gL_{\theta_t}(x_i), \quad x_1, \dots x_B \stackrel{\footnotesize{\text{i.i.d}}}{\sim} \gD_\text{train}
+    \theta_{t+1} = \theta_t - \eta_{t} \frac{1}{B} \sum_{i=1}^B \nabla_\theta \gL_{\theta_t}(x_i), \quad x_1, \dots x_B \stackrel{\footnotesize{\text{i.i.d}}}{\sim} \gD_\text{train}
 \end{equation}
-
-This algorithm is the central idea behind all popular optimization algorithms used for training deep neural networks, such as Adam~\citep{kingma2014adam}.
+Where $\eta_t$ is a time-dependent learning rate usually annealed to $0$ to ensure convergence. This algorithm is the central idea behind all popular optimization algorithms used for training deep neural networks, such as Adam~\citep{kingma2014adam} which uses momentum and where the gradient is preconditioned by a data-dependent ``normalization'' matrix.

@@ -33,7 +33,7 @@ In practice, the agent will interact with the environment in the following manne
 \STATE \textit{// Initialize starting state}
 \STATE $s_0 \sim \mu(\cdot)$
 \STATE $\tau_{0:0} = \{ \}$
-\FOR{$t$ in $\{0,\ldots, T\}$ }
+\FOR{$t$ in $\{0,\ldots, \infty\}$ }
 \STATE \textit{// Sample and execute action}
 \STATE $a_t \sim \pi(a_t|s_t)$
 \STATE $s_{t+1}, r_t \sim \penv(\cdot | s_t, a_t)$
@@ -48,11 +48,11 @@ In practice, the agent will interact with the environment in the following manne
 \end{center}
 \vspace{1em}
 
-Where a trajectory $\tau_{0:T}$ is the sequence of state-action pairs $\traj_{0:T}=\{(s_0,a_0), \ldots,(s_T, a_T) \}$ encountered and $R_t$ is the empirical discounted return, i.e the sum of discounted rewards for this trajectory. It appears clearly that this process is highly stochastic as it requires sampling actions from our policy (which could have a high entropy) as well as sampling the next state and reward from the environment transition dynamics $\penv$, which is a priori unknown and could be highly unpredictable. Therefore, even for a given policy $\pi$, the trajectory sampled $\tau$ and its associated discounted return $R_t$ can be vastly different every time \Cref{alg:sample_traj} is run. This \emph{noise} arising from the interaction between the agent and the environment at the core of most contributions presented in this thesis.
+Where a trajectory $\traj_{0:t}$ is the sequence of state-action pairs $\traj_{0:t}=\{(s_0,a_0), \ldots,(s_t, a_t) \}$ encountered and $R_t$ is the empirical discounted return, i.e the sum of discounted rewards for this trajectory. It appears clearly that this process is highly stochastic as it requires sampling actions from our policy (which could have a high entropy) as well as sampling the next state and reward from the environment transition dynamics $\penv$, which is a priori unknown and could be highly unpredictable. Therefore, even for a given policy $\pi$, the trajectory sampled $\tau$ and its associated discounted return $R_t$ can be vastly different every time \Cref{alg:sample_traj} is run. This \emph{noise} arising from the interaction between the agent and the environment at the core of most contributions presented in this thesis.
 
-Furthermore, under some conditions\footnote{For a unique stationary distribution to exist, the MDP must be \emph{irreducible} and \emph{aperiodic}.} the MDP admits a unique \emph{stationary distribution} $d^\pi$. \Cref{alg:sample_traj}, if ran with $T\to\infty$, would eventually sample states and actions according to $d^\pi$. If we are interested in the discounted return, we can adapt \Cref{alg:sample_traj} by adding a probability $1-\gamma$ of restarting from the initial distribution $\mu$ at every step. The stationary distribution of this discounted MDP will be referred to as $d^\pi_\gamma$.
+Furthermore, under some conditions\footnote{For a unique stationary distribution to exist, the MDP must be \emph{irreducible} and \emph{aperiodic}.} the MDP admits a unique \emph{stationary distribution} $d^\pi$. \Cref{alg:sample_traj}, if ran with enough times, would eventually sample states and actions according to $d^\pi$. If we are interested in the discounted return, we can adapt \Cref{alg:sample_traj} by adding a probability $1-\gamma$ of restarting from the initial distribution $\mu$ at every step and never break the interaction loop. The stationary distribution of this discounted MDP will be referred to as $d^\pi_\gamma$.
 
-While in traditional optimization we assume we can evaluate our objective function immediately, in reinforcement learning it needs to be evaluated though this noisy interactive process. Thus, it is not surprising that many of the algorithms used in reinforcement learning have the following structure
+While in traditional optimization we assume we can evaluate our objective function immediately, in reinforcement learning it needs to be evaluated through this noisy interactive process. Thus, it is not surprising that many of the algorithms used in reinforcement learning have the following structure
 
 \begin{center}
 \begin{minipage}{0.9\textwidth}
