@@ -1,4 +1,5 @@
-\chapter{Appendix A}
+\chapter{Independently Controllable Factors}
+
 \section{Additional details}
 \subsection{Architecture}
 Our architecture is as follows: the encoder, mapping the raw pixel state to a latent representation, is a 4-layer convolutional neural network with batch normalization \citep{ioffe2015batch} and leaky ReLU activations. The decoder uses the transposed architecture with ReLU activations. The noise $z$ is sampled from a 2-dimensional gaussian distribution and both the generator $\Phi(h,z)$ and the policy $\pi(h,\phi)$ are neural networks consisting of 2 fully-connected layers. In practice, a minibatch of $n = 256$ or $1024$ vectors $\phi_1, \dots, \phi_{n}$ is sampled at each step. The agent randomly choses one $\phi = \phi_{behavior}$ and samples actions from its policy $a \sim \pi(h, \phi_{behavior})$. Our model parameters are then updated using policy gradient with the REINFORCE estimator and a state-dependent baseline and importance sampling. For each selectivity reward, the term $\mathbb{E}_{\phi'}[  A(h', h,\phi')]$ is estimated as $\tfrac{1}{n} \sum_{i = 1}^n A(h', h,\phi_i)$.
