@@ -122,15 +122,15 @@ In the same manner
 
 More generally, by unrolling the equation for $n$ steps instead of just one, we can get
 \begin{equation}
-      V^\pi(s)  = \E [\sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n V^\pi(s_{t+n})]
+      V^\pi(s)  = \E [\sum_{t'=t}^{t+n-1} \gamma^{t'-t} r_{t'} + \gamma^n V^\pi(s_{t+n})]
 \end{equation}
-And we will refer to $R^{n}_t \triangleq \sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n
+And we will refer to $R^{n}_t \triangleq \sum_{t'=t}^{t+n-1} \gamma^{t'-t} r_{t'} + \gamma^n
 V^\pi(s_{t+n})$ as the \emph{$n$-step return}, which is a random variable
 conditioned on state $s_t$. The expected $0$-step return is simply the value function of $s_t$ while the $\infty$-step return (i.e where we unroll until the episode stops) is the empirical discounted return $R_t$. This circles back to the definition of $V^\pi(s_t)$ as being the expected empirical return from $s_t$. As all the $n$-step returns are unbiased estimates of the value function, it is also possible to mix them in order to obtain new estimators such as the $\lambda$-return which weights the $n$-step returns according to a geometric distribution of parameter $\lambda$
 
 \begin{equation}
 \label{eq:lambda_return}
-    R^\lambda_t \triangleq (1-\lambda) \sum_{n \ge 1} \lambda^{n-1} \sum_{t'=t}^{t+n-1} r_{t'} + \gamma^n V^\pi(s_{t+n})
+    R^\lambda_t \triangleq (1-\lambda) \sum_{n \ge 1} \lambda^{n-1} \bigg( \sum_{t'=t}^{t+n-1} \gamma^{t'-t} r_{t'} + \gamma^n V^\pi(s_{t+n}) \bigg)
 \end{equation}
 
 For $\lambda=0$, we get back the $1$-step return $r_t + \gamma V^\pi(s_t)$ while for $\lambda \to 1$, $R^\lambda_t$ is the Monte Carlo return, i.e the empirical discounted return until the end of the episode.

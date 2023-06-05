@@ -1,8 +1,7 @@
 \chapter{Probabilistic Planning with Sequential Monte Carlo Methods}
-\section{Appendix}
-\label{sec:appendix}
+\label{app:appendix_smcp}
 
-\subsection{Abbreviation and Notation}
+\section{Abbreviation and Notation}
 \label{app:notation}
 \begin{table}[H]\caption{Abbreviation}
 \begin{center}% used the environment to augment the vertical space
@@ -30,12 +29,12 @@ MPC: & Model Predictive Control\\
 % between the caption and the table
 \begin{tabular}{r c p{10cm} }
 \toprule
-$\traj_{1:T}$ & $\triangleq$ & $\{\rvs_i, \rva_i\}_{i=1}^T$ the state-action pairs.\\
+$\traj_{1:T}$ & $\triangleq$ & $\{s_i, a_i\}_{i=1}^T$ the state-action pairs.\\
 $V$  & $\triangleq$ & value function.\\
 $\mathcal{O}_t$ & $\triangleq$ & Optimality variable.\\
-$p(\mathcal{O}_t|\rvs_t, \rva_t)$ & $\triangleq$ & $\exp(r(\rvs_t, \rva_t))$ Probability of a pair state action of being optimal.\\
-$\penv$ & $\triangleq$ & Transition probability of the environment. Takes state and action $(\rvs_t, \rva_t)$ as argument and return next state and reward $(\rvs_{t+1}, r_t)$.\\
-$\pmodel$ & $\triangleq$ & Model of the environment. Takes state and action $(\rvs_t, \rva_t)$ as argument and return next state and reward $(\rvs_{t+1}, r_t)$.\\
+$p(\mathcal{O}_t|s_t, a_t)$ & $\triangleq$ & $\exp(r(s_t, a_t))$ Probability of a pair state action of being optimal.\\
+$\penv$ & $\triangleq$ & Transition probability of the environment. Takes state and action $(s_t, a_t)$ as argument and return next state and reward $(s_{t+1}, r_t)$.\\
+$\pmodel$ & $\triangleq$ & Model of the environment. Takes state and action $(s_t, a_t)$ as argument and return next state and reward $(s_{t+1}, r_t)$.\\
 % $w$ & $\triangleq$ & Unnormalized weight of the importance sampling.\\ 
 % $\bar{w}$ & $\triangleq$ & Normalized weight of the importance sampling.\\
 $w_t$ & $\triangleq$ & Importance sampling weight.\\ 
@@ -51,7 +50,7 @@ $h$ & $\triangleq$ & horizon length. \\
 \label{tab:notation}
 \end{table}
 
-%\subsection{Ablation Study}
+%\section{Ablation Study}
 %
 %\begin{figure}
 %    \centering
@@ -60,44 +59,44 @@ $h$ & $\triangleq$ & horizon length. \\
 %    \label{fig:my_label}
 %\end{figure}
 
-\subsection{The action prior}
+\section{The action prior}
 \label{app:action_prior}
 
 The true joint distribution~\ref{eq:posterior_target} in section~\ref{sec:control_as_inference} should actually be written:
 \begin{eqnarray*}
 \label{eq:true_posterior_target}
-p(\traj_{1:T}, \gO_{1:T}) &=& \mu(\rvs_1) \prod_{t=1}^{T-1} \penv(\rvs_{t+1}|\rva_t, \rvs_t) \prod_{t=1}^{T} p(\rva_t) \exp\big(\sum_{t=1}^{T} r(\rvs_t, \rva_t)\big) \\
-&=& \mu(\rvs_1) \prod_{t=1}^{T-1} \penv(\rvs_{t+1}|\rva_t, \rvs_t)\exp\big(\sum_{t=1}^{T} r(\rvs_t, \rva_t) + \log p(\rva_t)\big) \\
+p(\traj_{1:T}, \gO_{1:T}) &=& \mu(s_1) \prod_{t=1}^{T-1} \penv(s_{t+1}|a_t, s_t) \prod_{t=1}^{T} p(a_t) \exp\big(\sum_{t=1}^{T} r(s_t, a_t)\big) \\
+&=& \mu(s_1) \prod_{t=1}^{T-1} \penv(s_{t+1}|a_t, s_t)\exp\big(\sum_{t=1}^{T} r(s_t, a_t) + \log p(a_t)\big) \\
 \end{eqnarray*}
 In Mujoco environments, the reward is typically written as 
-$$r(\rvs_t, \rva_t) = f(\rvs_t) - \alpha ||\rva_t||_2^2 $$
-where $f$ is a function of the state (velocity for HalfCheetah on Mujoco for example). The part $\alpha ||\rva_t||_2^2$ can be seen as the contribution from the action prior (here a gaussian prior).
+$$r(s_t, a_t) = f(s_t) - \alpha ||a_t||_2^2 $$
+where $f$ is a function of the state (velocity for HalfCheetah on Mujoco for example). The part $\alpha ||a_t||_2^2$ can be seen as the contribution from the action prior (here a gaussian prior).
 One can also consider the prior to be constant (and potentially improper) so that is does not change the posterior $p(\traj_{1:T}| \gO_{1:T})$.
 
-% \subsection{Recursive filtering weights}
+% \section{Recursive filtering weights}
 
 % \label{app:rec_weights}
 % \begin{align}
 % w_t &= \frac{p(\traj_{1:t} | \gO_{1:t})}{q(\traj_{1:t})} \nonumber\\
-% &= \frac{p(\traj_{1:t-1} | \gO_{1:t-1}) \penv(\rvs_{t+1} | \rvs_t, \rva_t) p(\gO_t | \rvs_t, \rva_t)}{q(\traj_{1:t-1}) q(\traj_t | \traj_{1:t-1})} \nonumber\\
-% &= \frac{p(\traj_{1:t-1} | \gO_{1:t-1}) }{q(\traj_{1:t-1}) }\frac{\penv(\rvs_{t+1} | \rvs_t, \rva_t) \exp(r_t)}{\pmodel(\rvs_{t+1} | \rvs_t, \rva_t) \pi_\parampol(\rva_t | \rvs_t)} \nonumber\\
-% &= w_{t-1}\frac{\penv(\rvs_{t+1} | \rvs_t, \rva_t)}{\pmodel(\rvs_{t+1} | \rvs_t, \rva_t) } \exp(r_t - \log \pi_\parampol(\rva_t | \rvs_t))
+% &= \frac{p(\traj_{1:t-1} | \gO_{1:t-1}) \penv(s_{t+1} | s_t, a_t) p(\gO_t | s_t, a_t)}{q(\traj_{1:t-1}) q(\traj_t | \traj_{1:t-1})} \nonumber\\
+% &= \frac{p(\traj_{1:t-1} | \gO_{1:t-1}) }{q(\traj_{1:t-1}) }\frac{\penv(s_{t+1} | s_t, a_t) \exp(r_t)}{\pmodel(s_{t+1} | s_t, a_t) \pi_\parampol(a_t | s_t)} \nonumber\\
+% &= w_{t-1}\frac{\penv(s_{t+1} | s_t, a_t)}{\pmodel(s_{t+1} | s_t, a_t) } \exp(r_t - \log \pi_\parampol(a_t | s_t))
 % \end{align}
 
-\subsection{Value function: backward message}
+\section{Value function: backward message}
  \label{app:backward_message}
 \begin{align}
     p(\gO_{t+1:T} | \traj_t) &=  \int_{\traj_{t+1}} p(\gO_{t+1:T}, \traj_{t+1} | \traj_t)d\traj_{t+1} \nonumber\\
      &=  \int_{\traj_{t+1}} p(\traj_{t+1} | \traj_{t}, \gO_{t+1:T}) p(\gO_{t+1:T} | \traj_{t+1}) d\traj_{t+1}  \nonumber\\
-    % &= \int_{\traj_{t+1}} p(\traj_{t+1}|\traj_t) \exp Q(\rvs_{t+1}, \rva_{t+1}) d\traj_{t+1} \nonumber\\
-     &= \int_{\rvs_{t+1}}  \penv(\rvs_{t+1} | \rvs_t, \rva_t) \left[ \int_{\rva_{t+1}} p(\rva_{t+1} | \rvs_{t+1}, \gO_{t+1:T}) \exp Q(\rvs_{t+1}, \rva_{t+1}) d\rva_{t+1}  \right] d\rvs_{t+1}\nonumber\\
-     &= \int_{\rvs_{t+1}} \penv(\rvs_{t+1} | \rvs_t, \rva_t)  \exp \big( V(\rvs_{t+1}) \big) d\rvs_{t+1}\nonumber\\
-       &= \E_{\rvs_{t+1} | \rvs_t, \rva_t} [ \exp \big( V(\rvs_{t+1}) \big)]
+    % &= \int_{\traj_{t+1}} p(\traj_{t+1}|\traj_t) \exp Q(s_{t+1}, a_{t+1}) d\traj_{t+1} \nonumber\\
+     &= \int_{s_{t+1}}  \penv(s_{t+1} | s_t, a_t) \left[ \int_{a_{t+1}} p(a_{t+1} | s_{t+1}, \gO_{t+1:T}) \exp Q(s_{t+1}, a_{t+1}) da_{t+1}  \right] ds_{t+1}\nonumber\\
+     &= \int_{s_{t+1}} \penv(s_{t+1} | s_t, a_t)  \exp \big( V(s_{t+1}) \big) ds_{t+1}\nonumber\\
+       &= \E_{s_{t+1} | s_t, a_t} [ \exp \big( V(s_{t+1}) \big)]
 \end{align}
 By definition of the optimal value function in~\citep{levine2018reinforcement}.
 
 
-\subsection{Recursive weights update}
+\section{Recursive weights update}
 % {\color{red} Version with Q function}
 % For this derivation, we need the forward backward equation
 % \begin{align}
@@ -118,23 +117,23 @@ w_t &= \frac{p(\traj_{1:t} | \gO_{1:T})}{q(\traj_{1:t})} \nonumber\\
 &\text{We use there the forward-backward equation~\ref{eq:forwardbackward} for the numerator and the denominator} \nonumber\\
  &\propto w_{t-1}   \frac{1}{ q(\traj_t | \traj_{1:t-1})} \frac{ \textcolor{orange}{p(\traj_{1:t} | \gO_{1:t})}}{ \textcolor{orange}{p(\traj_{1:t-1} | \gO_{1:t-1})}} \frac{ \textcolor{beta}{p(\gO_{t+1:T} | \traj_{t})}}{ \textcolor{beta}{p(\gO_{t:T} | \traj_{t-1})}}   \nonumber\\
 &= w_{t-1}   \frac{ p(\traj_t | \traj_{1:t-1})}{ q(\traj_t | \traj_{1:t-1})}  p(\gO_t | \traj_t)   \frac{ p(\gO_{t+1:T} | \traj_{t})}{ p(\gO_{t:T} | \traj_{t-1})}  \nonumber\\
-&= w_{t-1}    \frac{\penv(\rvs_{t} | \rvs_{t-1}, \rva_{t-1})}{ \pmodel(\rvs_{t} | \rvs_{t-1}, \rva_{t-1}) }   \frac{\exp (r_t)}{\pi_\parampol(\rva_t|\rvs_t)} \frac{\E_{\rvs_{t+1} | \rvs_t, \rva_t} [ \exp \big( V(\rvs_{t+1}) \big)] }{\E_{\rvs_{t} | \rvs_{t-1}, \rva_{t-1}} [ \exp \big( V(\rvs_{t}) \big)]}  \nonumber\\
-% &= \frac{p(\traj_{1:t-1} | \gO_{1:t-1}) }{q(\traj_{1:t-1}) }\frac{\penv(\rvs_{t+1} | \rvs_t, \rva_t) \exp(r_t)}{\pmodel(\rvs_{t+1} | \rvs_t, \rva_t) \pi_\parampol(\rva_t | \rvs_t)} \nonumber\\
-% &= w_{t-1}\frac{\penv(\rvs_{t+1} | \rvs_t, \rva_t)}{\pmodel(\rvs_{t+1} | \rvs_t, \rva_t) } \exp(r_t - \log \pi_\parampol(\rva_t | \rvs_t))
-&= w_{t-1} \frac{\penv(\rvs_{t} | \rvs_{t-1}, \rva_{t-1})}{ \pmodel(\rvs_{t} | \rvs_{t-1}, \rva_{t-1}) }  \E_{\rvs_{t+1} | \rvs_t, \rva_t} [ \exp \big( r_t  -  \log \pi_\parampol(\rva_t | \rvs_t) + V(\rvs_{t+1}) - \log \E_{\rvs_{t} | \rvs_{t-1}, \rva_{t-1}} [ \exp \big( V(\rvs_{t}) \big)] \big)]
+&= w_{t-1}    \frac{\penv(s_{t} | s_{t-1}, a_{t-1})}{ \pmodel(s_{t} | s_{t-1}, a_{t-1}) }   \frac{\exp (r_t)}{\pi_\parampol(a_t|s_t)} \frac{\E_{s_{t+1} | s_t, a_t} [ \exp \big( V(s_{t+1}) \big)] }{\E_{s_{t} | s_{t-1}, a_{t-1}} [ \exp \big( V(s_{t}) \big)]}  \nonumber\\
+% &= \frac{p(\traj_{1:t-1} | \gO_{1:t-1}) }{q(\traj_{1:t-1}) }\frac{\penv(s_{t+1} | s_t, a_t) \exp(r_t)}{\pmodel(s_{t+1} | s_t, a_t) \pi_\parampol(a_t | s_t)} \nonumber\\
+% &= w_{t-1}\frac{\penv(s_{t+1} | s_t, a_t)}{\pmodel(s_{t+1} | s_t, a_t) } \exp(r_t - \log \pi_\parampol(a_t | s_t))
+&= w_{t-1} \frac{\penv(s_{t} | s_{t-1}, a_{t-1})}{ \pmodel(s_{t} | s_{t-1}, a_{t-1}) }  \E_{s_{t+1} | s_t, a_t} [ \exp \big( r_t  -  \log \pi_\parampol(a_t | s_t) + V(s_{t+1}) - \log \E_{s_{t} | s_{t-1}, a_{t-1}} [ \exp \big( V(s_{t}) \big)] \big)]
 \end{align}
 
 
 % As 
-% $$p(\traj_{1:t} | \gO_{1:t}) = \mu(\rvs_1) \prod_{\tau=1}^{t-1} \penv(\rvs_{\tau+1}|\rva_\tau, \rvs_\tau) \exp\big(\sum_{\tau=1}^{t} r(\rvs_\tau, \rva_\tau) + \log p(\rva_\tau) \big)$$
+% $$p(\traj_{1:t} | \gO_{1:t}) = \mu(s_1) \prod_{\tau=1}^{t-1} \penv(s_{\tau+1}|a_\tau, s_\tau) \exp\big(\sum_{\tau=1}^{t} r(s_\tau, a_\tau) + \log p(a_\tau) \big)$$
 % We have
-% $$\frac{p(\traj_{1:t} | \gO_{1:t})}{ p(\traj_{1:t-1} | \gO_{1:t-1})}  = \penv(\rvs_{t} | \rvs_{t-1}, \rva_{t-1}) \exp\big( r(\rvs_t, \rva_t) + \log p(\rva_t) \big)$$
+% $$\frac{p(\traj_{1:t} | \gO_{1:t})}{ p(\traj_{1:t-1} | \gO_{1:t-1})}  = \penv(s_{t} | s_{t-1}, a_{t-1}) \exp\big( r(s_t, a_t) + \log p(a_t) \big)$$
 
 % Therefore we obtain
-% \subsection{Residual Sampling}
+% \section{Residual Sampling}
 % \label{app:res_sampling}
 
-\subsection{Experiment Details}
+\section{Experiment Details}
 \label{app:exp_details}
 
 \paragraph{Random samples:} 1000 transitions are initially collected by a random policy to pretrain the model and the proposal distribution. After which the agents start following their respective policy.
@@ -172,7 +171,7 @@ where $\alpha$ was taken from the Mujoco gym environments. We used Adam \citep{k
 \end{table}
 
 
-\subsection{Sequential Importance Sampling Planning}
+\section{Sequential Importance Sampling Planning}
 \label{app:sis_algo}
 
 
@@ -184,34 +183,34 @@ where $\alpha$ was taken from the Mujoco gym environments. We used Adam \citep{k
 \FOR{$t$ in $\{1,\ldots,T\}$}
 %\STATE \textbf{Input:} root node $s_0$, model $\mathcal{M}$, and policy $\pi(a_t, s_t)$.
 % \STATE $\{s_t\}_{n=0}^N \sim \delta(s_t)$ 
-\STATE $\{ \rvs^{(n)}_t = \rvs_t\}_{n=1}^N$
+\STATE $\{ s^{(n)}_t = s_t\}_{n=1}^N$
 \STATE  $\{w^{(n)}_t =1\}_{n=1}^N$
 \FOR{$i$ in $\{t,\ldots,t+h\}$}
 \STATE \textit{// Update}
-\STATE $\{\rva^{(n)}_{i} \sim \pi(\rva^{(n)}_{i}|\rvs^{(n)}_{i})\}_{n=1}^N$
-\STATE $\{\rvs^{(n)}_{i+1}, r^{(n)}_{i} \sim \pmodel(\cdot | \rvs^{(n)}_{i}, \rva^{(n)}_{i})\}_{n=1}^N$
-\STATE $\{w_i^{(n)} \propto w^{(n)}_{i-1} \cdot \exp \big( A(\rvs^{(n)}_{i}, \rva^{(n)}_{i}, \rvs^{(n)}_{i+1}) \big) \}_{n=1}^N$
-% \STATE $\{w^{(n)}_{i|T} \propto \mathunderline{alpha}{w_i^{(n)}} \cdot \mathunderline{beta}{\exp(V(\rvs^{(n)}_{i+1}))}\}_{n=1}^N$
+\STATE $\{a^{(n)}_{i} \sim \pi(a^{(n)}_{i}|s^{(n)}_{i})\}_{n=1}^N$
+\STATE $\{s^{(n)}_{i+1}, r^{(n)}_{i} \sim \pmodel(\cdot | s^{(n)}_{i}, a^{(n)}_{i})\}_{n=1}^N$
+\STATE $\{w_i^{(n)} \propto w^{(n)}_{i-1} \cdot \exp \big( A(s^{(n)}_{i}, a^{(n)}_{i}, s^{(n)}_{i+1}) \big) \}_{n=1}^N$
+% \STATE $\{w^{(n)}_{i|T} \propto \mathunderline{alpha}{w_i^{(n)}} \cdot \mathunderline{beta}{\exp(V(s^{(n)}_{i+1}))}\}_{n=1}^N$
 % \STATE Compute the importance sampling weights $\hat{w}_T = w_i \cdot \exp(V(s_{t+1}))$
 % \STATE \textit{// Resampling}
 % \STATE $\{\traj^{(n)}_{1:i}\}_{n=1}^N \sim \text{Mult}(n; w_{i}^{(1)}, \ldots, w_{i}^{(N)})$
 % \STATE $\{w_i^{(n)} =1 \}_{n=1}^N$
 \ENDFOR
 % \STATE \val{what?} $w_T \propto w_{t+h}$
-% \STATE $w_{h|T} \propto w_{t+h} \exp(V^{SAC}(\rvs_{t+h+1}))$
+% \STATE $w_{h|T} \propto w_{t+h} \exp(V^{SAC}(s_{t+h+1}))$
 \STATE Sample $n \sim \text{Categorical}(w_{t+h}^{(1)}, \ldots, w_{t+h}^{(N)})$.
 %  \STATE Sample $n \sim \text{Uniform}(1, N)$.
 \STATE \textit{// Model Predictive Control}
-\STATE Select $\rva_t$, first action of $\traj^{(n)}_{t:t+h}$
-\STATE $\rvs_{t+1}, r_t \sim p_{\text{env}}(\cdot|\rvs_t, \rva_t)$
-% \STATE $\rvs_t \leftarrow \rvs_{t+1}$.
-\STATE Add $(\rvs_t, \rva_t, r_t, \rvs_{t+1})$ to buffer $\mathcal{B}$
+\STATE Select $a_t$, first action of $\traj^{(n)}_{t:t+h}$
+\STATE $s_{t+1}, r_t \sim p_{\text{env}}(\cdot|s_t, a_t)$
+% \STATE $s_t \leftarrow s_{t+1}$.
+\STATE Add $(s_t, a_t, r_t, s_{t+1})$ to buffer $\mathcal{B}$
 \STATE Update $\pi$, $V$ and $\pmodel$ with $\mathcal{B}$
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Significance of the results}
+\section{Significance of the results}
 \label{sec:significance}
 The significance of our results is done following guidelines from~\citet{colas2018many}. We test the hypothesis that the mean return of our method is superior to the one of SAC. We use 20 random seeds (from 0 to 19pro) for each method on each environment.
 
@@ -225,9 +224,9 @@ $p_{\text{val}} < 0.05$ usually indicates that there is strong evidence to sugge
 \end{itemize}
 % \citep{henderson2017deep, colas2018many} we test the hypothesis that the average reward of SIR-SAC is above the average reward of SAC
 
-\subsection{Additional experimental results}
+\section{Additional experimental results}
 \label{app:add_results}
-\subsubsection{Effective Sample Size}
+\subsection{Effective Sample Size}
 \label{app:ess}
 
 \begin{figure}[!h]
@@ -250,7 +249,7 @@ We can see that as the proposal distribution improves the ESS also increases. Th
 While these values are not high, we are still around $15 \%$ thus we do not suffer heavily from weight degeneracy. 
 
 
-\subsubsection{Model loss}
+\subsection{Model loss}
 \label{app:model_loss}
 We also report the negative log likelihood loss of the environment's model during the training on Figure~\ref{fig:neg_log_lik}.
 
