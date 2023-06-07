@@ -48,14 +48,32 @@ There are several areas of research that I think are of particular interest.
 % For future works, we would like to continue to explore the role of stochasticity in reinforcement learning and optimization algorithms. In particular, we would like to investigate the following directions:
 
 \begin{enumerate}
-    \item While in this thesis we have mostly been concerned with policy optimization, I would like to turns my attention towards value estimation and the general concept of \emph{credit assignment}. 
-    
-    In the same way that the stochasticity of the environment and the policy 
-    Stochasticity and credit assignement? How does the the structure of the
-environment can effect learning of the value function?
 
-\item Concentration in high dimensions and the behavior of some objects become
-deterministic~\citep{thomas2022role}.
+\item While in this thesis we have mostly been concerned with policy
+        optimization, I would like to turns my attention towards value
+        estimation and the general concept of \emph{credit assignment}.
+        Specifically, how fast we can learn the value function depends on the
+        interplay between the states our policy samples, the state features and
+        the dynamics of the environment. 
+        % Concerning the last point, the
+        % important of the matrix $\rmP^\pi$, I would like
+        % to understand more precisely how the structure of the environment can
+        % impact how efficient learning a value function can be. One approach
+        % related to our recent work CITE
+
+\item One area which I find particularly exciting is the behavior of
+    reinforcement learning algoritms in high dimensions. We already published a
+        work in that direction~\citep{thomas2022role} using the fact that under
+        some assumption, the behavior of large models in large environments can
+        asymptotically become predictable. While this first work was focussed on
+        Temporal Difference algorithms with linear function approximation, I
+        would be interested to extend these results to 1) non-linear function
+        approximators such as neural networks using the neural tangent kernel
+        (NTK) regime. And 2) analyze the behavior of policy gradient methods
+        with this tool. These further investigations would allow us to better
+        understand the average case behavior of policy evaluation and
+        optimization algorithms in high dimensions.
+
 \end{enumerate}
  
 End goal: being able to understand the properties that affects the behaviors of
